@@ -31,6 +31,7 @@ in this Software without prior written authorization from The Open Group.
 #include "Xlibint.h"
 #include <X11/Xutil.h>		/* for XDestroyImage */
 #include "ImUtil.h"
+#include <limits.h>
 
 #define ROUNDUP(nbytes, pad) (((((nbytes) - 1) + (pad)) / (pad)) * (pad))
 
@@ -57,7 +58,7 @@ XImage *XGetImage (
 	xGetImageReply rep;
 	register xGetImageReq *req;
 	char *data;
-	long nbytes;
+	unsigned long nbytes;
 	XImage *image;
 	LockDisplay(dpy);
 	GetReq (GetImage, req);
@@ -79,10 +80,13 @@ XImage *XGetImage (
 		return (XImage *)NULL;
 	}
 
-	nbytes = (long)rep.length << 2;
-	data = (char *) Xmalloc((unsigned) nbytes);
+	if (rep.length < (INT_MAX >> 2)) {
+	    nbytes = (unsigned long)rep.length << 2;
+	    data = Xmalloc(nbytes);
+	} else
+	    data = NULL;
 	if (! data) {
-	    _XEatData(dpy, (unsigned long) nbytes);
+	    _XEatDataWords(dpy, rep.length);
 	    UnlockDisplay(dpy);
 	    SyncHandle();
 	    return (XImage *) NULL;

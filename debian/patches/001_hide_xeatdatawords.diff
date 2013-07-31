@@ -1,0 +1,33 @@
+Index: libx11/include/X11/Xlibint.h
+===================================================================
+--- libx11.orig/include/X11/Xlibint.h
++++ libx11/include/X11/Xlibint.h
+@@ -926,10 +926,12 @@ extern void _XEatData(
+     Display*		/* dpy */,
+     unsigned long	/* n */
+ ) _XLIB_COLD;
++#ifdef XLIB_WANT_XEATDATAWORDS
+ extern void _XEatDataWords(
+     Display*		/* dpy */,
+     unsigned long	/* n */
+-) _XLIB_COLD;
++) _XLIB_COLD _X_HIDDEN;
++#endif
+ #if defined(__SUNPRO_C) /* Studio compiler alternative to "cold" attribute */
+ # pragma rarely_called(_XEatData, _XEatDataWords)
+ #endif
+Index: libx11/configure.ac
+===================================================================
+--- libx11.orig/configure.ac
++++ libx11/configure.ac
+@@ -90,6 +90,10 @@ no)
+ esac
+ AC_SUBST(X11_EXTRA_DEPS)
+ 
++# Debian change: _XEatDataWords is not declared by default, to not affect other
++# X libs
++AC_DEFINE(XLIB_WANT_XEATDATAWORDS, 1, [Declare _XEatDataWords in Xlibint.h])
++
+ dnl Issue an error if xtrans.m4 was not found and XTRANS_CONNECTION_FLAGS macro
+ dnl was not expanded, since libX11 with no transport types is rather useless.
+ dnl

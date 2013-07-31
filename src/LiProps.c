@@ -35,7 +35,7 @@ Atom *XListProperties(
     Window window,
     int *n_props)  /* RETURN */
 {
-    long nbytes;
+    unsigned long nbytes;
     xListPropertiesReply rep;
     Atom *properties;
     register xResourceReq *req;
@@ -51,14 +51,14 @@ Atom *XListProperties(
 
     if (rep.nProperties) {
 	nbytes = rep.nProperties * sizeof(Atom);
-	properties = (Atom *) Xmalloc ((unsigned) nbytes);
-	nbytes = rep.nProperties << 2;
+	properties = Xmalloc (nbytes);
 	if (! properties) {
-	    _XEatData(dpy, (unsigned long) nbytes);
+	    _XEatDataWords(dpy, rep.length);
 	    UnlockDisplay(dpy);
 	    SyncHandle();
 	    return (Atom *) NULL;
 	}
+	nbytes = rep.nProperties << 2;
 	_XRead32 (dpy, (long *) properties, nbytes);
     }
     else properties = (Atom *) NULL;
