@@ -26,7 +26,6 @@ from The Open Group.
 
 */
 
-#define NEED_REPLIES
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -73,7 +72,7 @@ Atom _XInternAtom(
 
     /* look in the cache first */
     if (!(atoms = dpy->atoms)) {
-	dpy->atoms = atoms = (AtomTable *)Xcalloc(1, sizeof(AtomTable));
+	dpy->atoms = atoms = Xcalloc(1, sizeof(AtomTable));
 	dpy->free_funcs->atoms = _XFreeAtomTable;
     }
     sig = 0;
@@ -128,7 +127,7 @@ _XUpdateAtomCache(
 
     if (!dpy->atoms) {
 	if (idx < 0) {
-	    dpy->atoms = (AtomTable *)Xcalloc(1, sizeof(AtomTable));
+	    dpy->atoms = Xcalloc(1, sizeof(AtomTable));
 	    dpy->free_funcs->atoms = _XFreeAtomTable;
 	}
 	if (!dpy->atoms)
@@ -148,7 +147,7 @@ _XUpdateAtomCache(
 	    }
 	}
     }
-    e = (Entry)Xmalloc(sizeof(EntryRec) + n + 1);
+    e = Xmalloc(sizeof(EntryRec) + n + 1);
     if (e) {
 	e->sig = sig;
 	e->atom = atom;

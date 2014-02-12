@@ -60,8 +60,9 @@ from The Open Group.
 #ifdef XTHREADS
 #include	"locking.h"
 #endif
-#include 	"XrmI.h"
 #include	<X11/Xos.h>
+#include	<sys/stat.h>
+#include	<limits.h>
 #include "Xresinternal.h"
 #include "Xresource.h"
 
@@ -494,7 +495,7 @@ static XrmDatabase NewDatabase(void)
 {
     register XrmDatabase db;
 
-    db = (XrmDatabase) Xmalloc(sizeof(XrmHashBucketRec));
+    db = Xmalloc(sizeof(XrmHashBucketRec));
     if (db) {
 	_XCreateMutex(&db->linfo);
 	db->table = (NTable)NULL;
@@ -581,23 +582,21 @@ static void GrowTable(
 	ltable = (LTable)table;
 	/* cons up a copy to make MoveValues look symmetric */
 	otable = *ltable;
-	ltable->buckets = (VEntry *)Xmalloc(i * sizeof(VEntry));
+	ltable->buckets = Xcalloc(i, sizeof(VEntry));
 	if (!ltable->buckets) {
 	    ltable->buckets = otable.buckets;
 	    return;
 	}
 	ltable->table.mask = i - 1;
-	bzero((char *)ltable->buckets, i * sizeof(VEntry));
 	MoveValues(&otable, ltable);
     } else {
 	register NTable ntable;
 
-	ntable = (NTable)Xmalloc(sizeof(NTableRec) + i * sizeof(NTable));
+	ntable = Xcalloc(1, sizeof(NTableRec) + (i * sizeof(NTable)));
 	if (!ntable)
 	    return;
 	*ntable = *table;
 	ntable->mask = i - 1;
-	bzero((char *)NodeBuckets(ntable), i * sizeof(NTable));
 	*prev = ntable;
 	MoveTables(table, ntable);
     }
@@ -829,7 +828,7 @@ static void PutEntry(
     NTable *nprev, *firstpprev;
 
 #define NEWTABLE(q,i) \
-    table = (NTable)Xmalloc(sizeof(LTableRec)); \
+    table = Xmalloc(sizeof(LTableRec)); \
     if (!table) \
 	return; \
     table->name = q; \
@@ -842,8 +841,10 @@ static void PutEntry(
 	nprev = NodeBuckets(table); \
     } else { \
 	table->leaf = 1; \
-	if (!(nprev = (NTable *)Xmalloc(sizeof(VEntry *)))) \
+	if (!(nprev = Xmalloc(sizeof(VEntry *)))) {\
+	    Xfree(table); \
 	    return; \
+        } \
 	((LTable)table)->buckets = (VEntry *)nprev; \
     } \
     *nprev = (NTable)NULL; \
@@ -954,9 +955,8 @@ static void PutEntry(
 	prev = nprev;
     }
     /* now allocate the value entry */
-    entry = (VEntry)Xmalloc(((type == XrmQString) ?
-			     sizeof(VEntryRec) : sizeof(DEntryRec)) +
-			    value->size);
+    entry = Xmalloc(((type == XrmQString) ?
+		     sizeof(VEntryRec) : sizeof(DEntryRec)) + value->size);
     if (!entry)
 	return;
     entry->name = q = *quarks;
@@ -986,13 +986,12 @@ static void PutEntry(
 	if (resourceQuarks) {
 	    unsigned char *prevQuarks = resourceQuarks;
 
-	    resourceQuarks = (unsigned char *)Xrealloc((char *)resourceQuarks,
-						       size);
+	    resourceQuarks = Xrealloc(resourceQuarks, size);
 	    if (!resourceQuarks) {
 		Xfree(prevQuarks);
 	    }
 	} else
-	    resourceQuarks = (unsigned char *)Xmalloc(size);
+	    resourceQuarks = Xmalloc(size);
 	if (resourceQuarks) {
 	    bzero((char *)&resourceQuarks[oldsize], size - oldsize);
 	    maxResourceQuark = (size << 3) - 1;
@@ -1087,13 +1086,15 @@ static void GetIncludeFile(
     XrmDatabase db,
     _Xconst char *base,
     _Xconst char *fname,
-    int fnamelen);
+    int fnamelen,
+    int depth);
 
 static void GetDatabase(
     XrmDatabase db,
-    _Xconst register char *str,
+    _Xconst char *str,
     _Xconst char *filename,
-    Bool doall)
+    Bool doall,
+    int depth)
 {
     char *rhs;
     char *lhs, lhs_s[DEF_BUFF_SIZE];
@@ -1135,11 +1136,11 @@ static void GetDatabase(
 
     str_len = strlen (str);
     if (DEF_BUFF_SIZE > str_len) lhs = lhs_s;
-    else if ((lhs = (char*) Xmalloc (str_len)) == NULL)
+    else if ((lhs = Xmalloc (str_len)) == NULL)
 	return;
 
     alloc_chars = DEF_BUFF_SIZE < str_len ? str_len : DEF_BUFF_SIZE;
-    if ((rhs = (char*) Xmalloc (alloc_chars)) == NULL) {
+    if ((rhs = Xmalloc (alloc_chars)) == NULL) {
 	if (lhs != lhs_s) Xfree (lhs);
 	return;
     }
@@ -1203,7 +1204,8 @@ static void GetDatabase(
 		    } while (c != '"' && !is_EOL(bits));
 		    /* must have an ending " */
 		    if (c == '"')
-			GetIncludeFile(db, filename, fname, str - len - fname);
+			GetIncludeFile(db, filename, fname, str - len - fname,
+			    depth);
 		}
 	    }
 	    /* spin to next newline */
@@ -1544,7 +1546,7 @@ XrmPutLineResource(
 {
     if (!*pdb) *pdb = NewDatabase();
     _XLockMutex(&(*pdb)->linfo);
-    GetDatabase(*pdb, line, (char *)NULL, False);
+    GetDatabase(*pdb, line, (char *)NULL, False, 0);
     _XUnlockMutex(&(*pdb)->linfo);
 }
 
@@ -1556,7 +1558,7 @@ XrmGetStringDatabase(
 
     db = NewDatabase();
     _XLockMutex(&db->linfo);
-    GetDatabase(db, data, (char *)NULL, True);
+    GetDatabase(db, data, (char *)NULL, True, 0);
     _XUnlockMutex(&db->linfo);
     return db;
 }
@@ -1592,7 +1594,15 @@ ReadInFile(_Xconst char *filename)
      * result that the number of bytes actually read with be <=
      * to the size returned by fstat.
      */
-    GetSizeOfFile(fd, size);
+    {
+	struct stat status_buffer;
+	if ( ((fstat(fd, &status_buffer)) == -1 ) ||
+             (status_buffer.st_size >= INT_MAX) ) {
+	    close (fd);
+	    return (char *)NULL;
+	} else
+	    size = (int) status_buffer.st_size;
+    }
 
     if (!(filebuf = Xmalloc(size + 1))) { /* leave room for '\0' */
 	close(fd);
@@ -1627,13 +1637,16 @@ GetIncludeFile(
     XrmDatabase db,
     _Xconst char *base,
     _Xconst char *fname,
-    int fnamelen)
+    int fnamelen,
+    int depth)
 {
     int len;
     char *str;
     char realfname[BUFSIZ];
 
     if (fnamelen <= 0 || fnamelen >= BUFSIZ)
+	return;
+    if (depth >= MAXDBDEPTH)
 	return;
     if (*fname != '/' && base && (str = strrchr(base, '/'))) {
 	len = str - base + 1;
@@ -1648,7 +1661,7 @@ GetIncludeFile(
     }
     if (!(str = ReadInFile(realfname)))
 	return;
-    GetDatabase(db, str, realfname, True);
+    GetDatabase(db, str, realfname, True, depth + 1);
     Xfree(str);
 }
 
@@ -1664,7 +1677,7 @@ XrmGetFileDatabase(
 
     db = NewDatabase();
     _XLockMutex(&db->linfo);
-    GetDatabase(db, str, filename, True);
+    GetDatabase(db, str, filename, True, 0);
     _XUnlockMutex(&db->linfo);
     Xfree(str);
     return db;
@@ -1688,7 +1701,7 @@ XrmCombineFileDatabase(
     } else
 	db = NewDatabase();
     _XLockMutex(&db->linfo);
-    GetDatabase(db, str, filename, True);
+    GetDatabase(db, str, filename, True, 0);
     _XUnlockMutex(&db->linfo);
     Xfree(str);
     if (!override)

@@ -31,8 +31,6 @@ THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #endif
 
-#define NEED_EVENTS
-#define NEED_REPLIES
 #define NEED_MAP_READERS
 #include "Xlibint.h"
 #include <X11/extensions/XKBgeom.h>
@@ -114,7 +112,6 @@ XkbBoundsPtr	bounds,sbounds;
 
     if ((!geom)||(!section)||(!row))
 	return False;
-    pos= 0;
     bounds= &row->bounds;
     bzero(bounds,sizeof(XkbBoundsRec));
     for (key=row->keys,pos=k=0;k<row->num_keys;k++,key++) {
@@ -149,7 +146,7 @@ register int	i;
 XkbShapePtr	shape;
 XkbRowPtr	row;
 XkbDoodadPtr	doodad;
-XkbBoundsPtr	bounds,rbounds=NULL;
+XkbBoundsPtr	bounds,rbounds;
 
     if ((!geom)||(!section))
 	return False;
@@ -188,6 +185,7 @@ XkbBoundsPtr	bounds,rbounds=NULL;
 	    default:
 		tbounds.x1= tbounds.x2= doodad->any.left;
 		tbounds.y1= tbounds.y2= doodad->any.top;
+		rbounds= &tbounds;
 		break;
 	}
 	_XkbCheckBounds(bounds,rbounds->x1,rbounds->y1);
@@ -366,12 +364,16 @@ Status	rtrn;
 	    }
 	    ol->num_points= olWire->nPoints;
 	}
-	if (shapeWire->primaryNdx!=XkbNoShape)
+	if ((shapeWire->primaryNdx!=XkbNoShape) &&
+	    (shapeWire->primaryNdx < shapeWire->nOutlines))
 	     shape->primary= &shape->outlines[shapeWire->primaryNdx];
-	else shape->primary= NULL;
-	if (shapeWire->approxNdx!=XkbNoShape)
+	else
+	    shape->primary= NULL;
+	if ((shapeWire->approxNdx!=XkbNoShape) &&
+	    (shapeWire->approxNdx < shapeWire->nOutlines))
 	     shape->approx= &shape->outlines[shapeWire->approxNdx];
-	else shape->approx= NULL;
+	else
+	    shape->approx= NULL;
 	XkbComputeShapeBounds(shape);
     }
     return Success;
@@ -617,6 +619,9 @@ XkbGeometryPtr	geom;
 	    if (status==Success)
 		status= _XkbReadGeomKeyAliases(&buf,geom,rep);
 	    left= _XkbFreeReadBuffer(&buf);
+	    if ((rep->baseColorNdx > geom->num_colors) ||
+		(rep->labelColorNdx > geom->num_colors))
+		status = BadLength;
 	    if ((status!=Success) || left || buf.error) {
 		if (status==Success)
 		    status= BadLength;

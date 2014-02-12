@@ -30,8 +30,8 @@ in this Software without prior written authorization from The Open Group.
  *	interface library (Xlib) to the X Window System Protocol (V11).
  *	Structures and symbols starting with "_" are private to the library.
  */
-#ifndef _XLIB_H_
-#define _XLIB_H_
+#ifndef _X11_XLIB_H_
+#define _X11_XLIB_H_
 
 #define XlibSpecificationRelease 6
 
@@ -1691,6 +1691,7 @@ extern XHostAddress *XListHosts(
     int*		/* nhosts_return */,
     Bool*		/* state_return */
 );
+_X_DEPRECATED
 extern KeySym XKeycodeToKeysym(
     Display*		/* display */,
 #if NeedWidePrototypes
@@ -4020,4 +4021,4 @@ extern void XFreeEventData(
 
 _XFUNCPROTOEND
 
-#endif /* _XLIB_H_ */
+#endif /* _X11_XLIB_H_ */

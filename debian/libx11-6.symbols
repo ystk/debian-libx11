@@ -791,7 +791,7 @@ libX11.so.6 libx11-6 #MINVER#
  _XCopyEventCookie@Base 2:1.2.99.901
  (optional)_XCopyToArg@Base 0 1
  _XCreateMutex_fn@Base 0
- (arch=alpha amd64 kfreebsd-amd64 ia64 sparc64)_XData32@Base 0
+ (arch=alpha amd64 kfreebsd-amd64 ia64 s390x sparc64)_XData32@Base 0
  _XDefaultError@Base 0
  _XDefaultIOError@Base 0
  (optional)_XDefaultOpenIM@Base 0 1
@@ -823,10 +823,10 @@ libX11.so.6 libx11-6 #MINVER#
  _XGetBitsPerPixel@Base 0
  _XGetHostname@Base 0
  (optional)_XGetLCValues@Base 0 1
+ _XGetRequest@Base 2:1.4.99.1
  _XGetScanlinePad@Base 0
  _XGetWindowAttributes@Base 0
  (optional)_XHeadOfDisplayList@Base 0 1
- (optional)_XIDHandler@Base 0 1
  (optional)_XIMCompileResourceList@Base 0 1
  _XIOError@Base 0
  _XIOErrorFunction@Base 0
@@ -853,7 +853,7 @@ libX11.so.6 libx11-6 #MINVER#
  _XProcessInternalConnection@Base 0
  _XProcessWindowAttributes@Base 0
  _XPutBackEvent@Base 0
- (arch=alpha amd64 kfreebsd-amd64 ia64 sparc64)_XRead32@Base 0
+ (arch=alpha amd64 kfreebsd-amd64 ia64 s390x sparc64)_XRead32@Base 0
  _XRead@Base 0
  _XReadEvents@Base 0
  _XReadPad@Base 0
@@ -868,8 +868,6 @@ libX11.so.6 libx11-6 #MINVER#
  _XSetClipRectangles@Base 0
  _XSetImage@Base 0
  _XSetLastRequestRead@Base 0
- (optional)_XSetPrivSyncFunction@Base 0 1
- (optional)_XSetSeqSyncFunction@Base 0 1
  _XStoreEventCookie@Base 2:1.2.99.901
  _XTextHeight16@Base 0
  _XTextHeight@Base 0
@@ -1103,9 +1101,9 @@ libX11.so.6 libx11-6 #MINVER#
  (optional)_XkbInternAtomFunc@Base 0 1
  (optional)_XkbNoteCoreMapChanges@Base 0 1
  (optional)_XkbPeekAtReadBuffer@Base 0 1
- (optional|arch=alpha amd64 kfreebsd-amd64 ia64 sparc64)_XkbReadBufferCopy32@Base 0 1
+ (optional|arch=alpha amd64 kfreebsd-amd64 ia64 s390x sparc64)_XkbReadBufferCopy32@Base 0 1
  (optional)_XkbReadBufferCopyKeySyms@Base 0 1
- (optional|arch=alpha amd64 kfreebsd-amd64 ia64 sparc64)_XkbReadCopyData32@Base 0 1
+ (optional|arch=alpha amd64 kfreebsd-amd64 ia64 s390x sparc64)_XkbReadCopyData32@Base 0 1
  (optional)_XkbReadCopyKeySyms@Base 0 1
  (optional)_XkbReadGetCompatMapReply@Base 0 1
  (optional)_XkbReadGetGeometryReply@Base 0 1
@@ -1114,7 +1112,7 @@ libX11.so.6 libx11-6 #MINVER#
  (optional)_XkbReadGetNamesReply@Base 0 1
  (optional)_XkbReloadDpy@Base 0 1
  (optional)_XkbSkipReadBufferData@Base 0 1
- (optional|arch=alpha amd64 kfreebsd-amd64 ia64 sparc64)_XkbWriteCopyData32@Base 0 1
+ (optional|arch=alpha amd64 kfreebsd-amd64 ia64 s390x sparc64)_XkbWriteCopyData32@Base 0 1
  (optional)_XkbWriteCopyKeySyms@Base 0 1
  (optional)_XkeyTable@Base 0 1
  (optional)_XlcAddCT@Base 0 1

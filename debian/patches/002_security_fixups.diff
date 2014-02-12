@@ -1,0 +1,43 @@
+From: Julien Cristau <jcristau@debian.org>
+Subject: Followup fixes for integer/buffer overflows
+
+Fix memory leak in _XF86BigfontQueryFont error paths
+
+diff --git a/src/Font.c b/src/Font.c
+index 62d6db9..e1e823a 100644
+--- a/src/Font.c
++++ b/src/Font.c
+@@ -549,6 +549,7 @@ _XF86BigfontQueryFont (
+        any real font needs, so the combined total doesn't overflow either */
+     if (reply.nUniqCharInfos > ((ULONG_MAX / 2) / SIZEOF(xCharInfo)) ||
+ 	reply.nCharInfos > ((ULONG_MAX / 2) / sizeof(CARD16))) {
++	Xfree(fs->properties);
+ 	Xfree((char *) fs);
+ 	_XEatDataWords(dpy, reply_left);
+ 	return (XFontStruct *)NULL;
+diff --git a/src/xkb/XKBGetMap.c b/src/xkb/XKBGetMap.c
+index 0875dfd..c73e655 100644
+--- a/src/xkb/XKBGetMap.c
++++ b/src/xkb/XKBGetMap.c
+@@ -426,7 +426,7 @@ XkbServerMapPtr		srv;
+ 
+     if ( rep->totalVModMapKeys>0 ) {
+ 	if (((int) rep->firstVModMapKey + rep->nVModMapKeys)
+-	     > xkb->max_key_code)
++	     > xkb->max_key_code + 1)
+ 	    return BadLength;
+ 	if (((xkb->server==NULL)||(xkb->server->vmodmap==NULL))&&
+ 	    (XkbAllocServerMap(xkb,XkbVirtualModMapMask,0)!=Success)) {
+diff --git a/src/xkb/XKBNames.c b/src/xkb/XKBNames.c
+index 6faef02..6df7406 100644
+--- a/src/xkb/XKBNames.c
++++ b/src/xkb/XKBNames.c
+@@ -180,7 +180,7 @@ _XkbReadGetNamesReply(	Display *		dpy,
+ 	    nKeys= xkb->max_key_code+1;
+ 	    names->keys= _XkbTypedCalloc(nKeys,XkbKeyNameRec);
+ 	}
+-	else if ( ((int)rep->firstKey + rep->nKeys) > xkb->max_key_code)
++	if ( ((int)rep->firstKey + rep->nKeys) > xkb->max_key_code + 1)
+ 	    goto BAILOUT;
+ 	if (names->keys!=NULL) {
+ 	    if (!_XkbCopyFromReadBuffer(&buf,

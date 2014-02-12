@@ -6,13 +6,14 @@ AM_CPPFLAGS= \
 	-I$(top_srcdir)/src/xcms \
 	-I$(top_srcdir)/src/xkb \
 	-I$(top_srcdir)/src/xlibi18n \
+	-I$(top_srcdir)/src \
 	-D_BSD_SOURCE -DXIM_t -DTRANS_CLIENT
 
 AM_CFLAGS= \
 	$(X11_CFLAGS) \
 	$(BIGFONT_CFLAGS) \
-	$(XDMCP_CFLAGS) \
-	$(MALLOC_ZERO_CFLAGS)
+	$(MALLOC_ZERO_CFLAGS) \
+	$(CWARNFLAGS)
 
 if XLIB_LOADABLE_I18N
 

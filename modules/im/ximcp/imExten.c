@@ -30,7 +30,6 @@ PERFORMANCE OF THIS SOFTWARE.
 #include <config.h>
 #endif
 #include <X11/Xatom.h>
-#define NEED_EVENTS
 #include "Xlibint.h"
 #include "Xlcint.h"
 #include "Ximint.h"
@@ -160,7 +159,7 @@ _XimProcExtForwardKeyEvent(
     XPutBackEvent(im->core.display, &ev);
 
     _XimRespSyncReply(ic, buf_s[0]);
-    MARK_FABLICATED(ic);
+    MARK_FABRICATED(im);
 
     return True;
 }

@@ -36,7 +36,7 @@
 
 /************************************************************************/
 
-#ifdef __UNIXOS2__
+#ifndef HAVE_SETEUID
 # define seteuid setuid
 #endif
 #define	iscomment(ch)	((ch) == '#' || (ch) == '\0')
@@ -54,29 +54,7 @@
 
 #define XLC_BUFSIZE 256
 
-#ifndef X_NOT_POSIX
-#ifdef _POSIX_SOURCE
-#include <limits.h>
-#else
-#define _POSIX_SOURCE
-#include <limits.h>
-#undef _POSIX_SOURCE
-#endif
-#endif
-#ifndef PATH_MAX
-#ifdef WIN32
-#define PATH_MAX 512
-#else
-#include <sys/param.h>
-#endif
-#ifndef PATH_MAX
-#ifdef MAXPATHLEN
-#define PATH_MAX MAXPATHLEN
-#else
-#define PATH_MAX 1024
-#endif
-#endif
-#endif
+#include "pathmax.h"
 
 #define NUM_LOCALEDIR	64
 
@@ -423,10 +401,7 @@ resolve_name(
 	    from = args[1], to = args[0];	/* right to left */
 	}
 	if (! strcmp(from, lc_name)) {
-	    name = Xmalloc(strlen(to) + 1);
-	    if (name != NULL) {
-		strcpy(name, to);
-	    }
+	    name = strdup(to);
 	    break;
 	}
     }
@@ -579,8 +554,7 @@ _XlcResolveLocaleName(
 
     if (name == NULL) {
 	/* vendor locale name == Xlocale name, no expansion of alias */
-	pub->siname = Xmalloc (strlen (lc_name) + 1);
-	strcpy (pub->siname, lc_name);
+	pub->siname = strdup (lc_name);
     } else {
 	pub->siname = name;
     }
@@ -685,8 +659,7 @@ _XlcLocaleDirName(char *dir_name, size_t dir_len, char *lc_name)
  		Xfree(name);
  	    continue;
  	}
- 	if ((1 + (target_dir ? strlen (target_dir) : 0) +
- 	     strlen("locale.dir")) < PATH_MAX) {
+ 	if ((1 + strlen (target_dir) + strlen("locale.dir")) < PATH_MAX) {
  	    sprintf(buf, "%s/locale.dir", target_dir);
  	    target_name = resolve_name(name, buf, RtoL);
  	}
@@ -730,8 +703,7 @@ _XlcLocaleDirName(char *dir_name, size_t dir_len, char *lc_name)
     last_dir_len = strlen (dir_name) + 1;
     last_dir_name = Xmalloc (last_dir_len);
     strcpy (last_dir_name, dir_name);
-    last_lc_name = Xmalloc (strlen (lc_name) + 1);
-    strcpy (last_lc_name, lc_name);
+    last_lc_name = strdup (lc_name);
 
     return dir_name;
 }
@@ -785,8 +757,7 @@ _XlcLocaleLibDirName(char *dir_name, size_t dir_len, char *lc_name)
  		Xfree(name);
  	    continue;
  	}
- 	if ((1 + (target_dir ? strlen (target_dir) : 0) +
- 	     strlen("locale.dir")) < PATH_MAX) {
+ 	if ((1 + strlen (target_dir) + strlen("locale.dir")) < PATH_MAX) {
  	    sprintf(buf, "%s/locale.dir", target_dir);
  	    target_name = resolve_name(name, buf, RtoL);
  	}
@@ -830,8 +801,7 @@ _XlcLocaleLibDirName(char *dir_name, size_t dir_len, char *lc_name)
     last_dir_len = strlen (dir_name) + 1;
     last_dir_name = Xmalloc (last_dir_len);
     strcpy (last_dir_name, dir_name);
-    last_lc_name = Xmalloc (strlen (lc_name) + 1);
-    strcpy (last_lc_name, lc_name);
+    last_lc_name = strdup (lc_name);
 
     return dir_name;
 }

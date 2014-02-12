@@ -24,7 +24,6 @@ in this Software without prior written authorization from The Open Group.
 
 */
 
-#define NEED_REPLIES
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -35,7 +34,7 @@ Colormap *XListInstalledColormaps(
     Window win,
     int *n)  /* RETURN */
 {
-    long nbytes;
+    unsigned long nbytes;
     Colormap *cmaps;
     xListInstalledColormapsReply rep;
     register xResourceReq *req;
@@ -52,14 +51,14 @@ Colormap *XListInstalledColormaps(
 
     if (rep.nColormaps) {
 	nbytes = rep.nColormaps * sizeof(Colormap);
-	cmaps = (Colormap *) Xmalloc((unsigned) nbytes);
-	nbytes = rep.nColormaps << 2;
+	cmaps = Xmalloc(nbytes);
 	if (! cmaps) {
-	    _XEatData(dpy, (unsigned long) nbytes);
+	    _XEatDataWords(dpy, rep.length);
 	    UnlockDisplay(dpy);
 	    SyncHandle();
 	    return((Colormap *) NULL);
 	}
+	nbytes = rep.nColormaps << 2;
 	_XRead32 (dpy, (long *) cmaps, nbytes);
     }
     else cmaps = (Colormap *) NULL;

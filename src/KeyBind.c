@@ -26,7 +26,6 @@ in this Software without prior written authorization from The Open Group.
 
 /* Beware, here be monsters (still under construction... - JG */
 
-#define NEED_EVENTS
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -45,6 +44,7 @@ in this Software without prior written authorization from The Open Group.
 #define XK_CAUCASUS
 #define XK_VIETNAMESE
 #define XK_XKB_KEYS
+#define XK_SINHALA
 #include <X11/keysymdef.h>
 #include <stdio.h>
 
@@ -997,11 +997,9 @@ XRebindKeysym (
     tmp = dpy->key_bindings;
     nb = sizeof(KeySym) * nm;
 
-    if ((! (p = (struct _XKeytrans *) Xmalloc( sizeof(struct _XKeytrans)))) ||
-	((! (p->string = (char *) Xmalloc( (unsigned) nbytes))) &&
-	 (nbytes > 0)) ||
-	((! (p->modifiers = (KeySym *) Xmalloc( (unsigned) nb))) &&
-	 (nb > 0))) {
+    if ((! (p = Xcalloc( 1, sizeof(struct _XKeytrans)))) ||
+	((! (p->string = Xmalloc(nbytes))) && (nbytes > 0)) ||
+	((! (p->modifiers = Xmalloc(nb))) && (nb > 0))) {
 	if (p) {
 	    if (p->string) Xfree(p->string);
 	    if (p->modifiers) Xfree((char *) p->modifiers);

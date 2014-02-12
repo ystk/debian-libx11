@@ -28,8 +28,6 @@ THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <config.h>
 #endif
 #include <stdio.h>
-#define NEED_REPLIES
-#define NEED_EVENTS
 #define	NEED_MAP_READERS
 #include "Xlibint.h"
 #include <X11/extensions/XKBproto.h>
@@ -183,6 +181,9 @@ int			tmp;
 	    return tmp;
     }
     if (rep->nBtnsWanted>0) {
+	if (((unsigned short) rep->firstBtnWanted + rep->nBtnsWanted)
+	    >= devi->num_btns)
+	    goto BAILOUT;
 	act= &devi->btn_acts[rep->firstBtnWanted];
 	bzero((char *)act,(rep->nBtnsWanted*sizeof(XkbAction)));
     }
@@ -192,6 +193,9 @@ int			tmp;
 	goto BAILOUT;
     if (rep->nBtnsRtrn>0) {
 	int size;
+	if (((unsigned short) rep->firstBtnRtrn + rep->nBtnsRtrn)
+	    >= devi->num_btns)
+	    goto BAILOUT;
 	act= &devi->btn_acts[rep->firstBtnRtrn];
 	size= rep->nBtnsRtrn*SIZEOF(xkbActionWireDesc);
 	if (!_XkbCopyFromReadBuffer(&buf,(char *)act,size))

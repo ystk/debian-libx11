@@ -1,27 +1,208 @@
-libx11 (2:1.3.3-4) unstable; urgency=low
+libx11 (2:1.5.0-1+deb7u1) wheezy-security; urgency=high
 
-  * Cherry-pick patches from upstream, 1.3-branch:
-    - man: Fix typo in Makefile
-    - Bug 27465 - Rewritten fi_FI.UTF-8 Compose file
-    - Fix typo in new fi_FI.UTF-8 that was reported by "make check"
-    - man: Redirect users from XKeycodeToKeysym to XkbKeycodeToKeysym #25732
-    - man: Fix return value specification of XkbKeyActionEntry
-    - man: Return value of XkbGetState is Status and not Bool
-    - man: Add missing geometry component flag
-    - man: Correct the XkbAllAccessXEventsMask mask name
-    - Fix manual typos.
-    - Allow X11 users to compose anarchism
-    - Clarify requirements in XRestackWindows man page
-    - Fix typo that made configure always report "none" for man page suffix
-    - Define FILE_MAN_DIR_SUFFIX so XCompose shadow page has correct path
-    - Compose.man: default user compose file is .XCompose, not .Xcompose
-    - Make Compose-comma map to Ogonek for A and E in UTF-8 locales.
-    - Make Compose-comma map to ogonek for I and U in UTF-8 locales.
-    - NLS: Add \o/ Compose sequence
-    - nls: Switch one of the interrobang sequences to gnaborretni
-    - Bug 29773: aliases for nb_NO.utf8 and nn_NO.utf8
+  * CVE-2013-1981: integer overflows calculating memory needs for replies
+  * CVE-2013-1997: buffer overflows due to not validating length or offset
+    values in replies
+  * CVE-2013-2004: unbounded recursion parsing user-specified files
+    (closes: #145048)
 
- -- Cyril Brulebois <kibi@debian.org>  Fri, 19 Nov 2010 17:52:14 +0100
+ -- Julien Cristau <jcristau@debian.org>  Tue, 21 May 2013 23:14:14 +0200
+
+libx11 (2:1.5.0-1) unstable; urgency=low
+
+  * New upstream release. Visible changes:
+    - Add APL support, yay!
+    - A few duplicated Compose sequences were tweaked or removed. Affected
+      characters are: Ã / µ / Ñ / ñ / ¹ / ² / ³ / Ó / ó / Ǻ / ǻ.
+  * Drop patch, fixed upstream:
+    - 001-configure-check-if-issetugid-is-declared.diff
+
+ -- Cyril Brulebois <kibi@debian.org>  Sat, 16 Jun 2012 20:32:52 +0000
+
+libx11 (2:1.4.99.901-2) unstable; urgency=low
+
+  * Add AC_CHECK_DECL(issetugid) to fix FTBFS on kfreebsd (closes: #669670).
+
+ -- Julien Cristau <jcristau@debian.org>  Sun, 29 Apr 2012 16:55:39 +0200
+
+libx11 (2:1.4.99.901-1) unstable; urgency=low
+
+  * New upstream release candidate (1.5 RC1)
+    - XQueryColors: split a request into multiple requests if necessary
+      (closes: #278984)
+    - Revert "xcb: Add TCP fallback" (closes: #659558)
+  * Don't require (fake)root for debian/rules clean.
+  * Drop xorg-sgml-doctools dependency from libx11-doc, the css is now
+    included in the html files directly.  Also add Breaks in addition to the
+    Replaces on old libx11-dev.
+  * Add build-indep and build-arch targets, don't build specs in build-arch.
+  * Rediff 006_tailor_pt_BR.UTF-8_Compose.diff and
+    015_russian_locale_alias.diff.
+  * Upload to unstable.
+
+ -- Julien Cristau <jcristau@debian.org>  Thu, 19 Apr 2012 22:58:30 +0200
+
+libx11 (2:1.4.99.1-1) experimental; urgency=low
+
+  [ Julien Cristau ]
+  * Move xorg-sgml-doctools dependency from -dev to -doc.
+  * Move libx11-doc from section libdevel to doc (closes: #648706).
+
+  [ Cyril Brulebois ]
+  * New upstream release candidate:
+    - Bug fixes, specs clean-up, new compose sequences.
+    - Add GetRequestSized.
+  * Bump xorg-sgml-doctools build-dep.
+  * Refresh patch:
+    - 006_tailor_pt_BR.UTF-8_Compose.diff
+  * Add symbol:
+    - _XGetRequest@Base
+  * Bump shlibs accordingly, for the udeb.
+
+ -- Cyril Brulebois <kibi@debian.org>  Thu, 22 Dec 2011 12:58:15 +0100
+
+libx11 (2:1.4.4-4) unstable; urgency=low
+
+  * debian/rules: since the documentation is moved to libx11-doc, the
+    exception handling for libx11-xcb-dev needs to also look at libx11-doc,
+    not libx11-dev.
+
+ -- Steve Langasek <vorlon@debian.org>  Fri, 11 Nov 2011 06:51:51 -0800
+
+libx11 (2:1.4.4-3) unstable; urgency=low
+
+  * Split documentation out from libx11-dev into a separate libx11-doc
+    package, so that libx11-dev can be multiarch co-installable.
+
+ -- Steve Langasek <vorlon@debian.org>  Wed, 09 Nov 2011 12:13:26 -0800
+
+libx11 (2:1.4.4-2) unstable; urgency=low
+
+  [ Colin Watson ]
+  * Fix cross-compilation breakage due to a typo in the multiarch patch
+    (closes: #642402)
+
+ -- Julien Cristau <jcristau@debian.org>  Thu, 22 Sep 2011 17:42:39 +0200
+
+libx11 (2:1.4.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * Drop xorg.css from libx11-dev, depend on xorg-sgml-doctools instead.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 30 Jul 2011 22:14:56 +0200
+
+libx11 (2:1.4.3-3) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * Add lintian override for the libx11-private dep in libx11-6.symbols.
+
+  [ Cyril Brulebois ]
+  * Fix the FTBFS on s390x (Closes: #635692): Add s390x to the list of
+    64-bit architectures in the symbols file. Thanks, Aurélien Jarno!
+
+ -- Cyril Brulebois <kibi@debian.org>  Thu, 28 Jul 2011 15:08:36 +0200
+
+libx11 (2:1.4.3-2) unstable; urgency=low
+
+  * Team upload.
+
+  [ Steve Langasek ]
+  * Build for multiarch.
+
+  [ Julien Cristau ]
+  * Bump Standards-Version to 3.9.2.
+  * Properly clean up libtool m4 files.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 11 Jun 2011 14:06:01 +0200
+
+libx11 (2:1.4.3-1) unstable; urgency=low
+
+  * New upstream release:
+    - Add Sinhala support.
+    - Add Docbook external references support.
+  * Bump x11proto-core-dev build-dep to make defining XK_SINHALA useful.
+  * Bump xutils-dev build-dep for newer macros.
+
+ -- Cyril Brulebois <kibi@debian.org>  Tue, 05 Apr 2011 23:42:05 +0200
+
+libx11 (2:1.4.2-1) unstable; urgency=low
+
+  [ Timo Aaltonen ]
+  * New upstream release. (closes: #463159)
+
+  [ Cyril Brulebois ]
+  * Bump x11proto-xf86bigfont-dev build-dep.
+
+ -- Cyril Brulebois <kibi@debian.org>  Sat, 26 Mar 2011 00:36:43 +0100
+
+libx11 (2:1.4.1-5) unstable; urgency=low
+
+  * Mark x11-data Multi-Arch: foreign.
+
+ -- Steve Langasek <vorlon@debian.org>  Mon, 21 Feb 2011 20:01:35 -0800
+
+libx11 (2:1.4.1-4) unstable; urgency=low
+
+  * Bump Standards-Version to 3.9.1.
+  * specs were converted from groff to xml, so we can ship the html version
+    now.
+  * Drop Build-Dependencies on groff/ghostscript/... since the docs were
+    converted to xml.
+
+ -- Julien Cristau <jcristau@debian.org>  Mon, 07 Feb 2011 12:36:09 +0100
+
+libx11 (2:1.4.1-3) unstable; urgency=low
+
+  * Remove David Nusinow and Brice Goglin from Uploaders.  Thanks for all your
+    work!
+  * Drop Conflicts on sarge-era xlibs-data, Replaces on sarge-era libx11-6,
+    Pre-Depends on x11-common (needed for upgrades from sarge), and Conflicts
+    against pre-XCB libx11-6.
+  * Wrap debian/control Depends fields.
+  * Upload to unstable.
+
+ -- Julien Cristau <jcristau@debian.org>  Sun, 06 Feb 2011 22:42:28 +0100
+
+libx11 (2:1.4.1-2) experimental; urgency=low
+
+  * Make libx11-data break earlier versions of libx11-6, since those rely
+    on XKeysymDB, resulting in a non-functional keyboard and plenty of
+    such messages: “Internal error: Could not resolve keysym *”.
+
+ -- Cyril Brulebois <kibi@debian.org>  Tue, 18 Jan 2011 18:47:22 +0100
+
+libx11 (2:1.4.1-1) experimental; urgency=low
+
+  [ Julien Cristau ]
+  * New upstream release.
+    - lots of fixes for multithreaded apps
+    - X11 users can now compose anarchism (closes: #555938)
+
+  [ Robert Hooker ]
+  * New upstream release.
+  * Don't install unshipped XKeysymDB.
+  * Bump xutils-dev build-dep to 1:7.5+5 for util-macros 1.11 requirement.
+
+  [ Cyril Brulebois ]
+  * New new (new) upstream release.
+  * As a temporary measure, add 020_keep_xorg_css.diff to avoid having to
+    depend on xorg-sgml-doctools just for xorg.css.
+  * Refresh all patches.
+  * Some functions got hidden by upstream in aebbf36238, since “none of
+    the functions in Xprivate.h should have any callers outside of Xlib,
+    by definition”. As a consequence, drop the following symbols from
+    libx11-6.symbols:
+    - _XIDHandler@Base
+    - _XSetPrivSyncFunction@Base
+    - _XSetSeqSyncFunction@Base
+  * Drop obsolete --enable-man-pages=3 from configure flags.
+  * Pass --with-xmlto and --without-fop for the documentation generation.
+  * Add xmlto, xorg-sgml-doctools, w3m build-dep accordingly.
+  * Remove *.xml before running dh_install, there's no point in shipping
+    those files.
+  * Update debian/copyright from upstream COPYING.
+
+ -- Cyril Brulebois <kibi@debian.org>  Thu, 13 Jan 2011 01:18:40 +0100
 
 libx11 (2:1.3.3-3) unstable; urgency=low
 
