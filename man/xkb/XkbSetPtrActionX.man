@@ -1,5 +1,5 @@
 '\" t
-.\" Copyright 1999 Sun Microsystems, Inc.  All rights reserved.
+.\" Copyright 1999 Oracle and/or its affiliates. All rights reserved.
 .\"
 .\" Permission is hereby granted, free of charge, to any person obtaining a
 .\" copy of this software and associated documentation files (the "Software"),
@@ -84,7 +84,7 @@ determine the new pointer Y coordinate.
 T}
 .TE
 
-Each of the X and Y coordinantes of the XkbPtrAction structure is composed of 
+Each of the X and Y coordinates of the XkbPtrAction structure is composed of
 two signed 16-bit values, that is, the X coordinate is composed of 
 .I high_XXX 
 and 

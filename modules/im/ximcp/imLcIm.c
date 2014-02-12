@@ -359,10 +359,10 @@ Private int _XimCachedFileName (
 
     if (len == 0 || dir [len-1] != '/')
        sprintf (*res, "%s/%c%d_%03x_%08x_%08x", dir, _XimGetMyEndian(),
-		XIM_CACHE_VERSION, sizeof (DefTree), hash, hash2);
+		XIM_CACHE_VERSION, (unsigned int)sizeof (DefTree), hash, hash2);
     else
        sprintf (*res, "%s%c%d_%03x_%08x_%08x", dir, _XimGetMyEndian(),
-		XIM_CACHE_VERSION, sizeof (DefTree), hash, hash2);
+		XIM_CACHE_VERSION, (unsigned int)sizeof (DefTree), hash, hash2);
 
 /* fprintf (stderr, "-> %s\n", *res); */
     if ( (fd = _XOpenFile (*res, O_RDONLY)) == -1)
@@ -489,10 +489,13 @@ _XimWriteCachedDefaultTree(
 
     /* This STILL might be racy on NFS */
     if ( (fd = _XOpenFileMode (cachename, O_WRONLY | O_CREAT | O_EXCL,
-			       0600)) < 0)
+			       0600)) < 0) {
+       Xfree(m);
        return;
+    }
     if (! (fp = fdopen (fd, "wb")) ) {
        close (fd);
+       Xfree(m);
        return;
     }
     fwrite (m, msize, 1, fp);

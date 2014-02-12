@@ -46,8 +46,8 @@ SOFTWARE.
 
 ******************************************************************/
 
-#ifndef _XUTIL_H_
-#define _XUTIL_H_
+#ifndef _X11_XUTIL_H_
+#define _X11_XUTIL_H_
 
 /* You must include <X11/Xlib.h> before including this file */
 #include <X11/Xlib.h>
@@ -250,7 +250,7 @@ typedef struct _XComposeStatus {
 #define IsModifierKey(keysym) \
   ((((KeySym)(keysym) >= XK_Shift_L) && ((KeySym)(keysym) <= XK_Hyper_R)) \
    || (((KeySym)(keysym) >= XK_ISO_Lock) && \
-       ((KeySym)(keysym) <= XK_ISO_Last_Group_Lock)) \
+       ((KeySym)(keysym) <= XK_ISO_Level5_Lock)) \
    || ((KeySym)(keysym) == XK_Mode_switch) \
    || ((KeySym)(keysym) == XK_Num_Lock))
 #else
@@ -823,4 +823,4 @@ extern int XXorRegion(
 
 _XFUNCPROTOEND
 
-#endif /* _XUTIL_H_ */
+#endif /* _X11_XUTIL_H_ */

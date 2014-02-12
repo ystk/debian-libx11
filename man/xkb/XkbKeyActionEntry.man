@@ -1,4 +1,4 @@
-.\" Copyright 1999 Sun Microsystems, Inc.  All rights reserved.
+.\" Copyright 1999 Oracle and/or its affiliates. All rights reserved.
 .\"
 .\" Permission is hereby granted, free of charge, to any person obtaining a
 .\" copy of this software and associated documentation files (the "Software"),
@@ -21,13 +21,13 @@
 .\"
 .TH XkbKeyActionEntry __libmansuffix__ __xorgversion__ "XKB FUNCTIONS"
 .SH NAME
-XkbKeyActionEntry \- Returns the key action corresponding to group grp and shift 
-level lvl from the 
-two-dimensional table of key actions associated with the key corresponding to 
+XkbKeyActionEntry \- Returns a pointer to the key action corresponding to
+group grp and shift level lvl from the two-dimensional table of key actions
+associated with the key corresponding to
 keycode
 .SH SYNOPSIS
 .HP
-.B XkbAction XkbKeyActionEntry
+.B XkbAction * XkbKeyActionEntry
 .BI "(\^XkbDescPtr " "xkb" "\^,"
 .BI "KeyCode " "keycode" "\^,"
 .BI "int " "shift" "\^,"

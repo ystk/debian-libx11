@@ -37,7 +37,7 @@ Sun Microsystems, Inc. or its licensors is granted.
 
 */
 /*
- * Copyright 2000 Sun Microsystems, Inc.  All rights reserved.
+ * Copyright 2000 Oracle and/or its affiliates. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -64,7 +64,6 @@ Sun Microsystems, Inc. or its licensors is granted.
 #include <config.h>
 #endif
 #include <stdio.h>
-#define NEED_EVENTS
 #include "Xlibint.h"
 #include "Xlcint.h"
 #include "XlcGeneric.h"
@@ -227,12 +226,10 @@ _XDefaultOpenIM(
     local_impart->ctow_conv = ctow_conv;
 
     if ((res_name != NULL) && (*res_name != '\0')){
-	im->core.res_name  = (char *)Xmalloc(strlen(res_name)+1);
-	strcpy(im->core.res_name,res_name);
+	im->core.res_name  = strdup(res_name);
     }
     if ((res_class != NULL) && (*res_class != '\0')){
-	im->core.res_class = (char *)Xmalloc(strlen(res_class)+1);
-	strcpy(im->core.res_class,res_class);
+	im->core.res_class = strdup(res_class);
     }
 
     return (XIM)im;
