@@ -1,3 +1,2120 @@
+commit cb107760df33ffc8630677e66e2e50aa37950a5c
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sun Sep 8 18:37:01 2013 -0700
+
+    libX11 1.6.2
+
+commit 215ce6a67863de7acfd6dd3562b4fd97ef87b411
+Author: Benno Schulenberg <bensberg@justemail.net>
+Date:   Sun Sep 1 12:38:30 2013 +0200
+
+    nls: Adding more accessible compose sequences for J́ and j́.
+    
+    Few keyboards have an <acute> key, so this adds the much more
+    accessible and usual compose sequences with <apostrophe>, ánd
+    the most comfortable ones with <dead_acute>.
+    
+    Signed-off-by: Benno Schulenberg <bensberg@justemail.net>
+    Signed-off-by: James Cloos <cloos@jhcloos.com>
+
+commit e9b14d10d0258bfcc273ff8bc84cd349dccda62c
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 24 17:27:43 2013 -0700
+
+    Bug 68413 - [Bisected]Error in `xterm': realloc(): invalid next size
+    
+    Pass *new* size to realloc, not old size.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit c2b8e30790c21d6386767265263b3294ce1b1f9a
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Aug 16 21:04:02 2013 -0700
+
+    Stop checking for HAVE_DIX_CONFIG_H on the client side
+    
+    Leftover from when these XKB files were shared with the server sources
+    and could be compiled in either the client or server, with the different
+    autoconf config files in each.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 84276609b2f0aec74fb464c428c7db5714b0fcfc
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Aug 16 18:27:28 2013 -0700
+
+    Rearrange some variable declarations & initializations in XKB
+    
+    Little things noticed during XKB restyling that seemed to make the
+    code easier to read.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit b90b7e859cf45ec76921fa21bbfc1f3840d6e8d1
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sun Aug 11 13:29:33 2013 -0700
+
+    Reindent XKB code to X.Org standard style
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit c0a0f78eb49c2e4ad956209de77475c85b9314ea
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Aug 16 18:14:14 2013 -0700
+
+    Fix overflow checks in _XkbReadKeySyms when key_sym_map is already created
+    
+    We were checking to make sure that the largest keysym value was within
+    the range of the allocated buffer, but checking against different limits
+    in the not-yet-allocated vs. the already-allocated branches.
+    
+    The check should be the same in both, and reflect the size used for the
+    allocation, which is based on the maximum key code value, so we move it
+    to be a common check, before we branch, instead of duplicating in each
+    branch.
+    
+    map->key_sym_map is an array of XkbSymMapRec structs, [0..max_key_code]
+    map->syms is the array for which num_syms is recorded, hence is not the
+    right value to check for ensuring our key_sym_map accesses are in range.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reported-by: Barry Kauler <bkauler@gmail.com>
+    Tested-by: Barry Kauler <bkauler@gmail.com>
+
+commit bea6cbd027973142fc64532274e1d16861b47190
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sun Aug 11 17:02:21 2013 -0700
+
+    Remove long unused src/udcInf.c
+    
+    I can find no record of what this file was for.  Neither the X11R6.8.2
+    monolith Imakefile nor any modular release Makefile.am have ever built
+    it and nothing else references it.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit bf3501e0395abe890acfea98fdd9f50a6966f118
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sun Aug 11 00:07:33 2013 -0700
+
+    Remove unnecessary casts of pointers to (char *) in calls to Xfree()
+    
+    Left one cast behind that is necessary to change from const char *
+    to char * in src/xlibi18n/lcCharSet.c.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 6ead9dd92ab90aabd9f0e328d59597e6b5bc09d3
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 23:57:55 2013 -0700
+
+    Don't cast sizeof() results to unsigned when passing to Xmalloc/Xcalloc
+    
+    sizeof() returns size_t, malloc() & calloc() expect sizes in size_t,
+    don't strip down to unsigned int and re-expand unnecessarily.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 25a7a329def672fc8d26078538173777850c6390
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 23:51:08 2013 -0700
+
+    Remove even more casts of return values from Xmalloc/Xrealloc
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit f8fa16092a148b74ca35b4beb182053352606f2f
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 23:05:13 2013 -0700
+
+    xlibi18n: fix argsize argument to _XlcParsePath
+    
+    The array is defined as having NUM_LOCALEDIR entries, so use that
+    instead of hardcoded 256 value (the other two calls already did this).
+    
+    Reported by parfait:
+       Buffer overflow (CWE 120): In pointer dereference of argv[argc] with index argc
+          Pointer size is 64 elements (of 8 bytes each), index is 255
+            at line 82 of src/xlibi18n/lcFile.c in function 'parse_line'.
+            called at line 178 in function '_XlcParsePath' with argv = argv.
+            called at line 722 in function '_XlcLocaleLibDirName' with argv = args, argsize = 256.
+            at line 82 of src/xlibi18n/lcFile.c in function 'parse_line'.
+            called at line 178 in function '_XlcParsePath' with argv = argv.
+            called at line 638 in function '_XlcLocaleDirName' with argv = args, argsize = 256.
+    
+    [ This bug was found by the Parfait 1.2.0 bug checking tool.
+      http://labs.oracle.com/pls/apex/f?p=labs:49:::::P49_PROJECT_ID:13 ]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit e7d46c6452c0b90fd66ae9f538546b968e0dd608
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 22:32:42 2013 -0700
+
+    i18n modules: Fix some const cast warnings
+    
+    imRm.c: In function '_XimSetICMode':
+    imRm.c:2419:37: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    imRm.c:2420:30: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    
+    lcGenConv.c: In function 'byteM_parse_codeset':
+    lcGenConv.c:345:13: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit cbd86eccf175dc82a5cbcea54c8bd21ce18b70c0
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 22:21:54 2013 -0700
+
+    xlibi18n: Fix a bunch of const cast warnings
+    
+    Add const qualifiers to casts where needed, remove other casts that
+    are no longer needed.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit eb3676113fc2dd0f34d92b89beb81b3f61569aa1
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 22:18:00 2013 -0700
+
+    Fix const handling in XSetLocaleModifiers
+    
+    Instead of reusing the input parameter to store the output, make a
+    result variable instead, so that there's less const confusion.
+    
+    Fixes gcc warnings:
+    lcWrap.c: In function 'XSetLocaleModifiers':
+    lcWrap.c:87:18: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    lcWrap.c:91:25: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    lcWrap.c:93:12: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 8ebbffa98563960910152e4f2e31cb032375d871
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 21:46:37 2013 -0700
+
+    Constify lc_name argument to _XlcLocaleDirName() & _XlcLocaleLibDirName()
+    
+    Makes code considerably less crufty and clears gcc warnings:
+    XlcDL.c: In function '_XlcDynamicLoad':
+    XlcDL.c:384:44: warning: cast discards '__attribute__((const))' qualifier
+     from pointer target type [-Wcast-qual]
+    XlcDL.c:386:51: warning: cast discards '__attribute__((const))' qualifier
+     from pointer target type [-Wcast-qual]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 07e4e864107b38c2f393564fdacc90f4e858f23f
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 13:37:53 2013 -0700
+
+    init_om: remove unneeded extra copy of string to local buffer
+    
+    Strings from the supported_charset_list[] were being copied one by
+    one to a stack buffer, and then strdup called on that buffer.
+    
+    Instead, just strdup the original string, without the local copy,
+    and use a more traditional for loop, so it's easier to figure out
+    what the code is doing (cleaning up a gcc const-cast warning in
+    the process).
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 1cec14dad904ba21a861f4af131be5982ecb83dd
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 12:34:53 2013 -0700
+
+    Delete unused XKB_INSURE_SIZE macro from XKBlibint.h
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 5f32182c7c4045540ff3833c48ee24a3a25726e2
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 12:19:17 2013 -0700
+
+    miRegionOp(): ensure region size is not updated if realloc fails
+    
+    This function performs operations on a region, and when finished,
+    checks to see if it should compact the rectangle list.  If the
+    number of rectangles for which memory is allocated in the list is
+    more than twice the number used, it tries to shrink.   realloc()
+    should not fail in this case, but if it does, might as well keep
+    the correct value for the number of allocated rectangles, so we
+    don't try to grow it unnecessarily later if adding to the region.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit bd2a0b5a187798bb2e2f05dc5062ca79e37075dd
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 12:19:17 2013 -0700
+
+    miRegionCopy(): handle realloc failure better
+    
+    Zero out the region size when freeing the region so callers don't think
+    there's anything there.   (Pointer is already set to NULL from the realloc
+    result itself.)  Return 0 to the callers, and have them cascade that back
+    to their callers to indicate failure, instead of their usual return value
+    of 1 on success.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 5dc8b5385d513bbda88697c2372db750d23f46d4
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 11:27:22 2013 -0700
+
+    Avoid memory leak/corruption if realloc fails in Xregion.h:MEMCHECK macro
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 453c4ee436ef32d91501d7736d7a91c1aeafc565
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 12:07:51 2013 -0700
+
+    Avoid memory leak/corruption if realloc fails in imLcPrs.c:parseline()
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit b3fea74ec5b7d4f83755a52a8d49c564b71c6d12
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 12:30:39 2013 -0700
+
+    lcDB.c: ensure buffer size is updated correctly if realloc fails
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 43bb822c714a73c3b2d15e621ffb3333cd10da8c
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Aug 10 11:07:47 2013 -0700
+
+    Avoid memory leak/corruption if realloc fails in XlcDL.c:resolve_object()
+    
+    Previously, if realloc failed to increase the size, we'd still
+    record that we had allocated the larger size, but the pointer
+    to it would be NULL, causing future calls to be broken, and the
+    previous allocation to be lost/leaked.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 5d47a39978e92bb34ec928b1b15d71c0c2434870
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Aug 9 23:33:03 2013 -0700
+
+    omGeneric.c: convert sprintf calls to snprintf
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 88a27a2aa9b7d35cb79b16334ea3413e572b724a
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Aug 9 23:30:30 2013 -0700
+
+    ximcp/imRm.c: convert sprintf calls to snprintf
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 4fadae243fb485628c9a137f5da3489ed6214b21
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Aug 9 23:02:12 2013 -0700
+
+    xlibi18n: convert sprintf calls to snprintf
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 36a7edf0e5edfc5ef4ff2c3a8b4fa3dc4796e854
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Aug 9 23:02:12 2013 -0700
+
+    lcfile: skip over any null entries in args list
+    
+    Previous code seemed to assume that printf("%s", NULL) would result
+    in a 0-length string, not "(null)" or similar, but since there's no
+    point looking for files in "(null)/filepath...", instead we just
+    skip over NULL entries in search paths when generating file names.
+    
+    In the *DirName() functions, this effectively just moves the "bail on
+    NULL in arg[i]" check up from the later code that assigned it to targetdir
+    and then bailed if that was NULL.
+    
+    Not sure how there ever could be a NULL in arg[i], given the current
+    implementation of XlcParsePath, but it's easy enough to check once and
+    reject up front instead of on every reference.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit ee0824f24392d5ca3d5fd5f5ed8d78c0d892f7c0
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Aug 9 22:00:09 2013 -0700
+
+    Fix file leak on malloc error in XlcDL.c:resolve_object()
+    
+    File Leak: Leaked File fp
+       at line 219 of lib/libX11/src/xlibi18n/XlcDL.c in function 'resolve_object'.
+          fp initialized at line 198 with fopen
+    
+    [ This bug was found by the Parfait 1.2.0 bug checking tool.
+      http://labs.oracle.com/pls/apex/f?p=labs:49:::::P49_PROJECT_ID:13 ]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 9b291044a240e5b9b031ed814e0c84e53a1c3084
+Author: Julien Cristau <jcristau@debian.org>
+Date:   Sat Jun 15 18:02:21 2013 +0200
+
+    Add missing locales to configure.ac
+    
+    Commits 40761898692e5063957bfa2518cca3d35b2e354a and
+    f198c6aa98f88ff285d903175a3c4c0fd33a4575 added two new locales
+    (sr_CS.UTF-8 and km_KH.UTF-8), but didn't list them in configure.ac,
+    meaning they're not included in tarballs.
+    
+    Signed-off-by: Julien Cristau <jcristau@debian.org>
+    Reviewed-by: James Cloos <cloos@jhcloos.com>
+
+commit 8f58e54a5f46c3cd4897a23b89950f4800ae38d4
+Author: ISHIKAWA,chiaki <ishikawa@yk.rim.or.jp>
+Date:   Tue Dec 18 15:28:05 2012 +0000
+
+    Fix bogus timestamp generated by XIM
+    
+    Fix bogus timestamp generted by XIM due to uninitialized
+    data field. Also set appropriate serial, too.
+    Fixes: https://bugs.freedesktop.org/show_bug.cgi?id=39367
+    
+    Signed-off-by: Chiaki ISHIKAWA <ishikawa@yk.rim.or.jp>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit e7fd6f0eda57300df4d6b695b7064610ca5dec57
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Thu Jun 16 18:47:49 2011 +0200
+
+    XIM: Fix sync problem on focus change.
+    
+    XSetICFocus() and XUnsetICFocus() are both asynchronous events.
+    This is a pretty stupid idea: those functions may undo certain
+    settings on the client side for which requests from the server
+    may still be in the queue unprocessed. Thus things may be set
+    in the wrong order ie instead of set -> unest it will be unset -> set.
+    Moreover there is no way for either the client or the server to
+    cause the event queue to be flushed - which is pretty bad as
+    XIM is bidirectional.
+    The scenario is as follows:
+    Two ICs are created:
+            ic1 = XCreateIC(im,
+                XNInputStyle, XIMPreeditCallbacks | XIMStatusCallbacks,
+                XNClientWindow, window,
+                XNPreeditAttributes, preedit_attr,
+                XNStatusAttributes, status_attr,
+                NULL);
+            ic2 = XCreateIC(im, XNInputStyle,
+                           XIMPreeditNothing | XIMStatusNothing,
+                           XNClientWindow, window, NULL);
+    Then the focus is removed from ic2:
+            XUnsetICFocus(ic2);
+    If SCIM is used as the input server it will send a bunch of requests
+    following an XCreateIC(). One of the requests registers a key release
+    filter. XUnsetICFocus() unsets both key press and release filters.
+    Since it is asynchronous, the input server requests to register key
+    press and release filters may not have been processed, when XUnsetICFocus()
+    is called. Since there is no explicite way for client programs to enforce
+    the request queue to be flushed explicitely before an X[Set/Unset]ICFocus()
+    call it would be safest to make those two calls synchronous in the sense
+    that they ensure the request queue has been handled before they execute.
+    The easiest way to do this from Xlib is thru a call to XGetICValues()
+    which sends a request to the server and subsequently reads the queue
+    from the server to the client. This will cause all outstanding requests
+    in the queue to be read and handled.
+    This is an ugly hack and this could be fixed directly in the client,
+    however it seems to be easier to fix Xlib than to fix numerous clients.
+    This problem arose since there is no well documented way how to handle
+    and synchronize XIM requests and not all input servers send requests
+    when an IC is created.
+    This has been discussed extensively in:
+     https://bugzilla.novell.com/show_bug.cgi?id=221326
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+
+commit 26ec7d3821bc19debc73c8c3e42e6e33ef6f856e
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Thu Jun 16 17:28:39 2011 +0200
+
+    XIM: Fix race on focus change: set 'FABRICATED' only when keyev filters in place.
+    
+    When synthesized key events are sent on commit XIM sets the 'fabricated'
+    flag so that the keypress handler knows that these were not real events.
+    This also happens when committing due to the loss of focus. However in this
+    case the keypress/release filters which consume and unset this flag are no
+    longer in the filter chain.
+    So the flag is erronously set when a real keyboard event is received after
+    focus has been regained. So the first event is wrongly treated as a
+    fabricated key in the keypress handler which will at the same time reset
+    the flag so the second key event is treated correctly.
+    This fix only sets the flag when at least one of the keyboard filters is in
+    place.
+    How to reproduce this bug: run scim, choose a Japanese input method start
+    two instances of xterm: start typing in one xterm (this should pop up an
+    IM window). Without comitting (hitting 'enter') move focus to the other
+    xterm, then move focus back. Start typing again. The first character will
+    be committed immediately without popping up an input window.
+    With this fix this behavior is gone.
+    
+    See also: https://bugzilla.novell.com/show_bug.cgi?id=239698
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+
+commit 44f84223f5e2dd46883fcbd352af2798bfa9aeb6
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Mon Jul 29 21:29:49 2013 -0700
+
+    libX11 1.6.1
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit d19cfaca15826943d3c637ef7fa5db0a23d5feed
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Jul 27 12:19:00 2013 -0700
+
+    Fix undefined XCMSDIR error when building lint library
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 3083cd43d7dcd59da587975e7cadda681cd8a103
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Jul 27 00:36:08 2013 -0700
+
+    Add ku_TR.UTF-8 (Kurdish language, Turkey region) to compose/locale.dir
+    
+    Upstreaming from changes originally integrated into OpenSolaris
+    under Sun bug id 6882572.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Thomas Klausner <wiz@NetBSD.org>
+
+commit 208e586c808e88a2ee819e4450dc27f557afc2bf
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Jul 27 01:03:18 2013 -0700
+
+    omGeneric: remove space between struct name & member name
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 7db74514e454d3fc4ff70aa08ddac66bfffda4dd
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Tue Jul 23 22:18:46 2013 -0700
+
+    Refactor common code from XAddHost & XRemoveHost into single function
+    
+    On the Xlib side, the only real difference is the mode flag we send
+    to the server with the address, so just make that an argument to the
+    function with the common code for packing the address into the request.
+    
+    (Aside from labels, gcc 4.7.2 generates identical code before & after
+     this change due to inlining, verified via diff of gcc -S output.)
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 3292195a64a9ce4f0d27134cd544651ec647e728
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Tue Jul 23 22:11:34 2013 -0700
+
+    XSetModifierMapping: Use Data instead of GetReqExtra
+    
+    Handle arbitrary length data in the same fashion as other calls,
+    avoiding need to ensure it fits all in the request buffer.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit feb131b18aee31c2c125dc3275b0260940245882
+Author: Kees Cook <kees@outflux.net>
+Date:   Sun Jun 9 11:13:43 2013 -0700
+
+    libX11: check "req" when calling GetReqExtra
+    
+    This fixes the two callers of GetReqExtra to check that "req" is non-NULL
+    to avoid crashing now that GetReqExtra does internal bounds-checking on
+    the resulting buffer sizes.
+    
+    Additionally updates comment describing return values to use names
+    instead of only literal values.
+    
+    Signed-off-by: Kees Cook <kees@outflux.net>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 54540d7cba0c2bfe9176221c7bca910058d304df
+Author: Kees Cook <kees@outflux.net>
+Date:   Sun Jun 9 11:13:42 2013 -0700
+
+    libX11: check size of GetReqExtra after XFlush
+    
+    Two users of GetReqExtra pass arbitrarily sized allocations from the
+    caller (ModMap and Host). Adjust _XGetRequest() (called by the GetReqExtra
+    macro) to double-check the requested length and invalidate "req" when
+    this happens. Users of GetReqExtra passing lengths greater than the Xlib
+    buffer size (normally 16K) must check "req" and fail gracefully instead
+    of crashing.
+    
+    Any callers of GetReqExtra that do not check "req" for NULL
+    will experience this change, in the pathological case, as a NULL
+    dereference instead of a buffer overflow. This is an improvement, but
+    the documentation for GetReqExtra has been updated to reflect the need
+    to check the value of "req" after the call.
+    
+    Bug that manifested the problem:
+    https://bugs.launchpad.net/ubuntu/+source/x11-xserver-utils/+bug/792628
+    
+    Signed-off-by: Kees Cook <kees@outflux.net>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 24d3ee0d08f24e23c91d55702f010f73d7b908e5
+Author: Thomas Klausner <wiz@NetBSD.org>
+Date:   Tue Jun 25 22:35:29 2013 +0200
+
+    Tighten out-of-range comparisons.
+    
+    [For all of these, LONG_MAX was the correct value to prevent overflows
+     for the recent CVEs.   Lowering to INT_MAX catches buggy replies from
+     the server that 32-bit clients would reject but 64-bit would accept,
+     so we catch bugs sooner, and really, no sane & working server should
+     ever report more than 2gb of extension names, font path entries,
+     key modifier maps, etc.  -alan- ]
+    
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 6d926088d80a08e13e6d6c4ff207b81ad52e667f
+Author: Thomas Klausner <wiz@NetBSD.org>
+Date:   Tue Jun 25 18:34:32 2013 +0200
+
+    Fix out-of-range comparison in _XF86BigfontQueryFont
+    
+    clang complained (correctly):
+    warning: comparison of constant 768614336404564650 with expression
+    of type 'CARD32' (aka 'unsigned int') is always true
+    [-Wtautological-constant-out-of-range-compare]
+    
+    [While LONG_MAX is correct, since it's used in size_t math, the
+     numbers have to be limited to 32-bit range to be usable by 32-bit
+     clients, and values beyond that range are far more likely to be
+     bugs in the data from the server than valid numbers of characters
+     in a font.   -alan- ]
+    
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 383e2b0d029482a0f4c39fe00e15397538576fc1
+Author: Thomas Klausner <wiz@NetBSD.org>
+Date:   Tue Jun 25 18:33:56 2013 +0200
+
+    Check for symbol existence with #ifdef, not #if
+    
+    Reviewed-by: Jamey Sharp <jamey@minilop.net>
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 9955d1c8de994a90fe7f2e3187e7362611d7d265
+Author: Thomas Klausner <wiz@NetBSD.org>
+Date:   Tue Jun 25 18:33:07 2013 +0200
+
+    Use newer callback-based API for XIM.
+    
+    Let libX11 load and make available the newer (X11R6) callback-based
+    API for XIM (expected by emacs).
+    
+    This patch updates the files to match the other nls/ files.
+    
+    Patch from Ian D. Leroux <idleroux@fastmail.fm> on pkgsrc-users@NetBSD.org
+    following a hint by Nhat Minh Lê <nhat.minh.le@gmail.com>.
+    
+    Reviewed-by: James Cloos <cloos@jhcloos.com>
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit a17ceb7100bd36c2db210473ee701deb5d515731
+Author: Thomas Klausner <wiz@NetBSD.org>
+Date:   Tue Jun 25 18:31:32 2013 +0200
+
+    Stop truncating source to destination length if it is larger.
+    
+    It seems useless to do that since the code tests for both source
+    length and destination to be non-zero. This fixes a cut'n'paste
+    problem in xterm where the paste length was limited to 1024 (BUFSIZ)
+    in button.c.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit a336db9a0add3ae0783dda6e52459236622a12af
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Mon Jun 24 23:02:05 2013 -0700
+
+    Require ANSI C89 pre-processor, drop pre-C89 token pasting support
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 9dfb0f3c0a761590bcdc1f3396b1e064da4e18e8
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Jun 7 11:30:11 2013 -0700
+
+    troff macro expansion in specs/libX11
+    
+    Many of the custom nroff macros (.ds <macro> <contents>) were left
+    unsubstituted in the nroff->docbook conversion.   This substitution
+    is now performed, via the following perl script:
+    
+    #! /usr/bin/perl -w -i
+    
+    use Text::Wrap;
+    
+    while ($_ = <>) {
+        while ($_ =~ m/\((\w+)\b/g) {
+            my $m = $1;
+            if (exists $macro{$m}) {
+                $_ =~ s/\($m/$macro{$m}/;
+                $_ = wrap('', '', $_);
+                $_ =~ s/[ \t]+$//;
+            }
+        }
+    
+        if ($_ =~ /\<!-- .ds (\w+) (.*) -->/) {
+            my ($m, $s) = ($1, $2);
+            $macro{$m} = $s;
+            while ($macro{$m} =~ /\\\s*$/) {
+                $macro{$m} =~ s/\\\s*$//ms;
+                $macro{$m} .= <>;
+                chomp($macro{$m});
+            }
+            $macro{$m} =~ s/\\ / /g;
+        } else {
+            print $_;
+        }
+    }
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 20c17bd9ebf767a24643279e45866dddcb57b5ce
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Jun 7 09:27:26 2013 -0700
+
+    specs/libX11: correct prototype for XListPixmapFormats/XImageByteOrder
+    
+    The XListPixmapFormats arguments was being shown with XImageByteOrder's
+    name and return types.   Appears to have been a glitch in the nroff ->
+    docbook conversion.
+    
+    Reported-by: ZHANG Zhaolong <zhangzl2013@126.com>
+    Reviewed-by: Jamey Sharp <jamey@minilop.net>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit ed3d830243c8a0eefaf24e15b11823272ffe5049
+Author: Thomas Klausner <wiz@NetBSD.org>
+Date:   Sun Jun 2 20:49:55 2013 +0200
+
+    Deal with the limited range of VAX floating point numbers when compiling for VAX.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 0a48235d63639fb917c44d27c86e928e79fbac66
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Jun 6 16:43:56 2013 -0400
+
+    Remove call to undefined macro.
+
+commit 9e4719b9b719f2f8d255f6778e2e8c1809e32599
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Jun 6 16:42:20 2013 -0400
+
+    Remove call to undefined macro.
+
+commit 8496122eb00ce6cd5d2308ee54f64b68c378e455
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Mon Jun 3 20:06:43 2013 -0700
+
+    Update README to reflect where to find the Xlib specs now
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 655d631e86c95b14888758b27ed2836ca3e3ce86
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Mon Jun 3 19:21:06 2013 -0700
+
+    libX11 1.6.0
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 4a89b7ea908554628f374537a79931c8006a2de3
+Author: Thomas Klausner <wiz@NetBSD.org>
+Date:   Sun Jun 2 11:49:54 2013 -0700
+
+    cmsMath.c: Add missing stdio header for printf(3) in DEBUG build.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 96dcf747f13b26b8e4d17b1bc8605d933c3e1dc6
+Author: Thomas Klausner <wiz@NetBSD.org>
+Date:   Sun Jun 2 20:49:48 2013 +0200
+
+    XCreateGC man page: Avoid .TS H and .TH macros
+    
+    Avoid .TS H and .TH for now as it doesn't alter the output in this case,
+    and improve the output with mandoc(1).
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 95a388158c9d73df7d24016d6a3d61506d7d53a4
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Thu May 23 19:43:35 2013 -0700
+
+    libX11 1.5.99.902 (1.6 RC2)
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit a3bdd2b090915fe0163b062f0e6576fe05dd332e
+Author: Julien Cristau <jcristau@debian.org>
+Date:   Thu May 23 20:39:46 2013 +0200
+
+    xkb: fix off-by-one in _XkbReadGetNamesReply and _XkbReadVirtualModMap
+    
+    The size of the arrays is max_key_code + 1.  This makes these functions
+    consistent with the other checks added for CVE-2013-1997.
+    
+    Also check the XkbGetNames reply when names->keys was just allocated.
+    
+    Signed-off-by: Julien Cristau <jcristau@debian.org>
+    Tested-by: Colin Walters <walters@verbum.org>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 7e30056e78e4b7979ff47f102e00327617266019
+Author: Niveditha Rau <Niveditha.Rau@Oracle.COM>
+Date:   Fri May 17 15:26:21 2013 -0700
+
+    Make sure internal headers include required headers
+    
+    Fixes builds with Solaris Studio 12.3 when lint is enabled, since it no
+    longer ignores *.h files, but complains when they reference undefined
+    typedefs or macros.
+    
+    Signed-off-by: Niveditha Rau <Niveditha.Rau@Oracle.COM>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 2820100bf8ba130b94253f415e7fa5ac28bb2037
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Thu May 16 23:05:36 2013 -0700
+
+    Free fs->properties in _XF86BigfontQueryFont overflow error path
+    
+    Fixes small memory leak introduced in commit 5669a22081
+    
+    Reported-by: Julien Cristau <jcristau@debian.org>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 3131740513133a9ff7cb12123d29ceb18584fc38
+Author: Matthieu Herrb <matthieu.herrb@laas.fr>
+Date:   Wed May 8 19:33:09 2013 +0200
+
+    XListFontsWithInfo: Re-decrement flist[0] before calling free() on it.
+    
+    Freeing a pointer that wasn't returned by malloc() is undefined
+    behavior and produces an error with OpenBSD's implementation.
+    
+    Signed-off-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 3fe4bea086149f06a142a8f1d575f627ec1e22c7
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Apr 19 14:30:40 2013 -0700
+
+    Give GNU & Solaris Studio compilers hints about XEatData branches
+    
+    Try to offset the cost of all the recent checks we've added by giving
+    the compiler a hint that the branches that involve us eating data
+    are less likely to be used than the ones that process it.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit e1b457beb8d4e831ef44279dada6c475cb955738
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sun Mar 31 12:22:35 2013 -0700
+
+    _XkbReadGetMapReply: reject maxKeyCodes smaller than the minKeyCode
+    
+    Various other bounds checks in the code assume this is true, so
+    enforce it when we first get the data from the X server.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 12ad4c6432496897ff000eb7cfecd0fb4b290331
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 16 10:03:13 2013 -0700
+
+    Use calloc in XOpenDisplay to initialize structs containing pointers
+    
+    Prevents trying to free uninitialized pointers if we have to bail out
+    partway through setup, such as if we receive a corrupted or incomplete
+    connection setup block from the server.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit d38527e25f8b6e2f1174ecc21260c5c5416f972e
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Thu Mar 7 23:46:05 2013 -0800
+
+    Remove more unnecessary casts from Xmalloc/calloc calls
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit b2c86b582c58f50c7b14da01cf7ebd20ef12a6b2
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 16:56:16 2013 -0800
+
+    Convert more _XEatData callers to _XEatDataWords
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 192bbb9e2fc45df4e17b35b6d14ea0eb418dbd39
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 9 11:04:37 2013 -0800
+
+    Make XGetWindowProperty() always initialize returned values
+    
+    Avoids memory corruption and other errors when callers access them
+    without checking to see if XGetWindowProperty() returned an error value.
+    
+    Callers are still required to check for errors, this just reduces the
+    damage when they don't.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit db1b1c871da29aa0545182bf888df81627f165a5
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 15:08:21 2013 -0800
+
+    Avoid overflows in XListExtensions() [CVE-2013-1997 15/15]
+    
+    Ensure that when breaking the returned list into individual strings,
+    we don't walk past the end of allocated memory to write the '\0' bytes
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 8d5936594993921acdfec778dd8f41b555e2543a
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 15:08:21 2013 -0800
+
+    Avoid overflows in XGetFontPath() [CVE-2013-1997 14/15]
+    
+    Ensure that when breaking the returned list into individual strings,
+    we don't walk past the end of allocated memory to write the '\0' bytes
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 0c404db6a92dc2c198328bf586c02d8abbe02013
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 15:08:21 2013 -0800
+
+    Avoid overflows in XListFonts() [CVE-2013-1997 13/15]
+    
+    Ensure that when breaking the returned list into individual strings,
+    we don't walk past the end of allocated memory to write the '\0' bytes
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 0b0f5d4358c3de7563d6af03f0d2ce454702a06a
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 15:08:21 2013 -0800
+
+    integer overflow in XGetModifierMapping() [CVE-2013-1981 13/13]
+    
+    Ensure that we don't underallocate when the server claims a very large reply
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit a351b8103b2ba78882e1c309e85893ca3abe2073
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 15:08:21 2013 -0800
+
+    integer overflow in XGetPointerMapping() & XGetKeyboardMapping() [CVE-2013-1981 12/13]
+    
+    Ensure that we don't underallocate when the server claims a very large reply
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 833f6b70bc789d33607f6dbfee9e0a4178ec4b59
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 15:08:21 2013 -0800
+
+    integer overflow in XGetImage() [CVE-2013-1981 11/13]
+    
+    Ensure that we don't underallocate when the server claims to have sent a
+    very large reply.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 79d8dc08eb98842173ce239b9dd60df0e9e9ae72
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 8 22:25:35 2013 -0800
+
+    integer overflow in XGetWindowProperty() [CVE-2013-1981 10/13]
+    
+    If the reported number of properties is too large, the calculations
+    to allocate memory for them may overflow, leaving us returning less
+    memory to the caller than implied by the value written to *nitems.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 164bf4dfe839b1cc75cdeee378a243d04a8200e4
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 13:18:48 2013 -0800
+
+    integer overflows in TransFileName() [CVE-2013-1981 9/13]
+    
+    When trying to process file paths the tokens %H, %L, & %S are expanded
+    to $HOME, the standard compose file path & the xlocaledir path.
+    If enough of these tokens are repeated and values like $HOME are set to
+    very large values, the calculation of the total string size required to
+    hold the expanded path can overflow, resulting in allocating a smaller
+    string than the amount of data we'll write to it.
+    
+    Simply restrict all of these values, and the total path size to PATH_MAX,
+    because really, that's all you should need for a filename path.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 460e8a223b87d4fa0ea1e97823e998a770e0f2a2
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 18:37:37 2013 -0800
+
+    integer truncation in _XimParseStringFile() [CVE-2013-1981 8/13]
+    
+    Called from _XimCreateDefaultTree() which uses getenv("XCOMPOSEFILE")
+    to specify filename.
+    
+    If the size of off_t is larger than the size of unsigned long (as in
+    32-bit builds with large file flags), a file larger than 4 gigs could
+    have its size truncated, leading to data from that file being written
+    past the end of the undersized buffer allocated for it.
+    
+    While configure.ac does not use AC_SYS_LARGEFILE to set large file mode,
+    builders may have added the large file compilation flags to CFLAGS on
+    their own.
+    
+    size is left limited to an int, because if your Xim file is
+    larger than 2gb, you're doing it wrong.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 226622349a4b1e16064649d4444a34fb4be4f464
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 12:39:58 2013 -0800
+
+    Unbounded recursion in _XimParseStringFile() when parsing include files [CVE-2013-2004 2/2]
+    
+    parseline() can call _XimParseStringFile() which can call parseline()
+    which can call _XimParseStringFile() which can call parseline() ....
+    eventually causing recursive stack overflow and crash.
+    
+    Limit is set to a include depth of 100 files, which should be enough
+    for all known use cases, but could be adjusted later if necessary.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 236b603d235dc264d1c6250dca09c745458a9088
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 12:01:39 2013 -0800
+
+    Unbounded recursion in GetDatabase() when parsing include files [CVE-2013-2004 1/2]
+    
+    GetIncludeFile() can call GetDatabase() which can call GetIncludeFile()
+    which can call GetDatabase() which can call GetIncludeFile() ....
+    eventually causing recursive stack overflow and crash.
+    
+    Easily reproduced with a resource file that #includes itself.
+    
+    Limit is set to a include depth of 100 files, which should be enough
+    for all known use cases, but could be adjusted later if necessary.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 076428918e6c35f66b9b55c3fa097ff06496d155
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 18:37:37 2013 -0800
+
+    integer overflow in ReadInFile() in Xrm.c [CVE-2013-1981 7/13]
+    
+    Called from XrmGetFileDatabase() which gets called from InitDefaults()
+    which gets the filename from getenv ("XENVIRONMENT")
+    
+    If file is exactly 0xffffffff bytes long (or longer and truncates to
+    0xffffffff, on implementations where off_t is larger than an int),
+    then size may be set to a value which overflows causing less memory
+    to be allocated than is written to by the following read() call.
+    
+    size is left limited to an int, because if your Xresources file is
+    larger than 2gb, you're very definitely doing it wrong.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 90fd5abac2faca86f9f100353a3c9c7b89f31484
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 11:44:19 2013 -0800
+
+    Integer overflows in stringSectionSize() cause buffer overflow in ReadColornameDB() [CVE-2013-1981 6/13]
+    
+    LoadColornameDB() calls stringSectionSize() to do a first pass over the
+    file (which may be provided by the user via XCMSDB environment variable)
+    to determine how much memory needs to be allocated to read in the file,
+    then allocates the returned sizes and calls ReadColornameDB() to load the
+    data from the file into that newly allocated memory.
+    
+    If stringSectionSize() overflows the signed ints used to calculate the
+    file size (say if you have an xcmsdb with ~4 billion lines in or a
+    combined string length of ~4 gig - which while it may have been
+    inconceivable when Xlib was written, is quite possible today), then
+    LoadColornameDB() may allocate a memory buffer much smaller than the
+    amount of data ReadColornameDB() will write to it.
+    
+    The total size is left limited to an int, because if your xcmsdb file
+    is larger than 2gb, you're doing it wrong.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit b9ba832401734e1cbd30a930c0d11d850293f3f9
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 11:25:25 2013 -0800
+
+    unvalidated length in _XimXGetReadData() [CVE-2013-1997 12/15]
+    
+    Check the provided buffer size against the amount of data we're going to
+    write into it, not against the reported length from the ClientMessage.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit de2e6c322c4aca22856b380f67f8e488e7510015
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 11:11:08 2013 -0800
+
+    unvalidated index/length in _XkbReadGetNamesReply() [CVE-2013-1997 11/15]
+    
+    If the X server returns key name indexes outside the range of the number
+    of keys it told us to allocate, out of bounds memory writes could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 2df882eeb3a70256170127a746a9ba26376599a1
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 11:01:04 2013 -0800
+
+    unvalidated index in _XkbReadVirtualModMap() [CVE-2013-1997 10/15]
+    
+    If the X server returns modifier map indexes outside the range of the number
+    of keys it told us to allocate, out of bounds memory writes could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 4d7c422a37eb9617fb22f8e37527c2b34b105665
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 11:04:44 2013 -0800
+
+    unvalidated index in _XkbReadExplicitComponents() [CVE-2013-1997 9/15]
+    
+    If the X server returns key indexes outside the range of the number of
+    keys it told us to allocate, out of bounds memory writes could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit e56a2ada719c5cfac5ed61a52a80ade86c0f5957
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 10:51:51 2013 -0800
+
+    unvalidated index in _XkbReadModifierMap() [CVE-2013-1997 8/15]
+    
+    If the X server returns modifier map indexes outside the range of the number
+    of keys it told us to allocate, out of bounds memory writes could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 06c086e8a1d8374ea9a95ff989f053c96bb1bdca
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 10:39:21 2013 -0800
+
+    unvalidated index in _XkbReadKeyBehaviors() [CVE-2013-1997 7/15]
+    
+    If the X server returns key behavior indexes outside the range of the number
+    of keys it told us to allocate, out of bounds memory writes could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 00626c3830b869259098985afa38933d77ccec72
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 09:40:22 2013 -0800
+
+    unvalidated index in _XkbReadKeyActions() [CVE-2013-1997 6/15]
+    
+    If the X server returns key action indexes outside the range of the number
+    of keys it told us to allocate, out of bounds memory access could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit fd7d4956bc7a1c4b5c38661b12777ebee4d685d9
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 09:28:33 2013 -0800
+
+    unvalidated index in _XkbReadKeySyms() [CVE-2013-1997 5/15]
+    
+    If the X server returns keymap indexes outside the range of the number of
+    keys it told us to allocate, out of bounds memory access could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 59ae16a00d18588e98af57d26e442af8ea42b7aa
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 09:18:26 2013 -0800
+
+    unvalidated indexes in _XkbReadGetGeometryReply() [CVE-2013-1997 4/15]
+    
+    If the X server returns color indexes outside the range of the number of
+    colors it told us to allocate, out of bounds memory access could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit bff938b9fe1629cbacb726509edfa2a3840b7207
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 09:12:47 2013 -0800
+
+    unvalidated indexes in _XkbReadGeomShapes() [CVE-2013-1997 3/15]
+    
+    If the X server returns shape indexes outside the range of the number
+    of shapes it told us to allocate, out of bounds memory access could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit f293659d5a4024bda386305bb7ebeb4647c40934
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 22:49:01 2013 -0800
+
+    unvalidated index in _XkbReadGetDeviceInfoReply() [CVE-2013-1997 2/15]
+    
+    If the X server returns more buttons than are allocated in the XKB
+    device info structures, out of bounds writes could occur.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit cddc4e7e3cb4b9b7ad25f8591971a86901c249f2
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 19:30:09 2013 -0800
+
+    unvalidated lengths in XAllocColorCells() [CVE-2013-1997 1/15]
+    
+    If a broken server returned larger than requested values for nPixels or
+    nMasks, XAllocColorCells would happily overflow the buffers provided by
+    the caller to write the results into.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 2cd62b5eb99ffbb2fce99f3c459455e630b35bf7
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 22:49:01 2013 -0800
+
+    integer overflow in XListHosts() [CVE-2013-1981 5/13]
+    
+    If the reported number of host entries is too large, the calculations
+    to allocate memory for them may overflow, leaving us writing beyond the
+    bounds of the allocation.
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit 1f6a3dbf699b85c0ea715ef21de7e7095a714e12
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 22:49:01 2013 -0800
+
+    integer overflow in XGetMotionEvents() [CVE-2013-1981 4/13]
+    
+    If the reported number of motion events is too large, the calculations
+    to allocate memory for them may overflow, leaving us writing beyond the
+    bounds of the allocation.
+    
+    v2: Ensure nEvents is set to 0 when returning NULL events pointer
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 39515b7c3ba8cae9021bf6695e378ae19487082f
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 22:49:01 2013 -0800
+
+    integer overflow in XListFontsWithInfo() [CVE-2013-1981 3/13]
+    
+    If the reported number of remaining fonts is too large, the calculations
+    to allocate memory for them may overflow, leaving us writing beyond the
+    bounds of the allocation.
+    
+    v2: Fix reply_left calculations, check calculated sizes fit in reply_left
+    v3: On error cases, also set values to be returned in pointer args to 0/NULL
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 5669a220816b7d58fcaf0c302ead16fbe5c87817
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 21:05:27 2013 -0800
+
+    integer overflow in _XF86BigfontQueryFont() [CVE-2013-1981 2/13]
+    
+    Similar to _XQueryFont, but with more ways to go wrong and overflow.
+    Only compiled if libX11 is built with XF86BigFont support.
+    
+    v2: Fix reply_left calculations, check calculated sizes fit in reply_left
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 6df8a63d34b7514077188e2062a13774f920c085
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 21:05:27 2013 -0800
+
+    integer overflow in _XQueryFont() on 32-bit platforms [CVE-2013-1981 1/13]
+    
+    If the CARD32 reply.nCharInfos * sizeof(XCharStruct) overflows an
+    unsigned long, then too small of a buffer will be allocated for the
+    data copied in from the reply.
+    
+    v2: Fix reply_left calculations, check calculated sizes fit in reply_left
+    
+    Reported-by: Ilja Van Sprundel <ivansprundel@ioactive.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 9f5d83706543696fc944c1835a403938c06f2cc5
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 20:54:24 2013 -0800
+
+    Add _XEatDataWords to discard a given number of 32-bit words of reply data
+    
+    Matches the units of the length field in X protocol replies, and provides
+    a single implementation of overflow checking to avoid having to replicate
+    those checks in every caller.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit d7f04c340ade3834e603c23d543132e1ee4e0c63
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 13:03:55 2013 -0800
+
+    Move repeated #ifdef magic to find PATH_MAX into a common header
+    
+    Lets stop duplicating the mess all over
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+
+commit f3a553a4e4a55d9d19deda1ea01883e1d5d682b1
+Author: Pander <pander@users.sourceforge.net>
+Date:   Tue May 7 18:38:14 2013 -0400
+
+    Add compose sequences for J́ and j́.
+    
+    The resulting sequences are:
+    
+      U+004A LATIN CAPITAL LETTER J  U+0301 COMBINING ACUTE ACCENT
+      U+006A LATIN SMALL LETTER J    U+0301 COMBINING ACUTE ACCENT
+    
+    Used in Dutch, per:
+    
+      http://lists.x.org/archives/xorg-devel/2013-February/035514.html
+      https://nl.wikipedia.org/wiki/Accenttekens_in_de_Nederlandse_spelling
+    
+    Signed-off-by: Pander <pander@users.sourceforge.net>
+    Signed-off-by: James Cloos <cloos@jhcloos.com>
+
+commit f49bb2dd6d4ea45c55bd21acc0efe2b764441020
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 16 18:30:56 2013 -0700
+
+    Move big request comment in XOpenDisplay to the right place
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 3996543c1b2919e97d61a5d70fe1ebd7cd76fc83
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 9 19:16:03 2013 -0800
+
+    libX11 1.5.99.901 (1.6 RC1)
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit f9cd175a471116a616e681fb0ca1a61b3d84a6a0
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 8 22:33:28 2013 -0800
+
+    Fix very weird indenting in src/GetFProp.c
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit e9bd757630368afb374c5d1bcc5d4d85ad3c6c4c
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 8 15:37:33 2013 -0800
+
+    XAllocClassHint: Assume calloc sets pointers in allocated memory to NULL
+    
+    While the C standard technically allows for the compiler to translate
+    pointer = 0 or pointer = NULL into something other than filling the
+    pointer address with 0 bytes, the rest of the Xlib code already assumes
+    that calloc initializes any pointers in the struct to NULL, and there
+    are no known systems supported by X.Org where this is not true.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 39547d600a13713e15429f49768e54c3173c828d
+Author: Karl Tomlinson <xmail@karlt.net>
+Date:   Mon Feb 18 01:25:34 2013 +0000
+
+    MakeBigReq: don't move the last word, already handled by Data32
+    
+    MakeBigReq inserts a length field after the first 4 bytes of the request
+    (after req->length), pushing everything else back by 4 bytes.
+    
+    The current memmove moves everything but the first 4 bytes back.
+    If a request aligns to the end of the buffer pointer when MakeBigReq is
+    invoked for that request, this runs over the buffer.
+    Instead, we need to memmove minus the first 4 bytes (which aren't moved),
+    minus the last 4 bytes (so we still align to the previous tail).
+    
+    The 4 bytes that fell out are already handled with Data32, which will
+    handle the buffermax correctly.
+    
+    The case where req->length = 1 was already not functional.
+    
+    Reported by Abhishek Arya <inferno@chromium.org>.
+    
+    https://bugzilla.mozilla.org/show_bug.cgi?id=803762
+    
+    Reviewed-by: Jeff Muizelaar <jmuizelaar@mozilla.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 3cdb6c3a1646f670afa03d424ec12ac418181d1e
+Author: Quentin Glidic <sardemff7+git@sardemff7.net>
+Date:   Tue Jan 15 21:07:17 2013 +0000
+
+    nls/Makefile.am: Use LOG_COMPILER
+    
+    TESTS_ENVIRONMENT is deprecated
+    
+    Signed-off-by: Quentin Glidic <sardemff7+git@sardemff7.net>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit df66d7a98e2bc7f44fb5583b645df87d525f07f1
+Author: Quentin Glidic <sardemff7+git@sardemff7.net>
+Date:   Tue Jan 15 21:07:16 2013 +0000
+
+    nls/Makefile.am: Remove unneeded $(srcdir)
+    
+    Signed-off-by: Quentin Glidic <sardemff7+git@sardemff7.net>
+    Reviewed-by: Gaetan Nadon <memsize@videotron.ca>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 3facbe5c0df1b5597571b7b00d5f7bdbc92fb278
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Mar 2 12:01:39 2013 -0800
+
+    Add <X11/Xresource.h> hint to all Xrm* man pages
+    
+    Help users figure out which header file they need to #include
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 466404007f2c8f7166e4faddfea1454c5bfe1e9a
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 8 17:13:09 2013 -0800
+
+    _xudc_code_to_glyph: check for NULL pointer *before* writing to it, not after
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 47d2eff64d167b3245d346d7f38ca703be645e26
+Author: Ken Moffat <ken@linuxfromscratch.org>
+Date:   Thu Mar 7 18:27:54 2013 -0500
+
+    dead_double_grave and dead_inverted_breve should only have one underscore.
+    
+    Correct instances of dead_double_grave and dead_inverted_breve to
+    dead_doublegrave and dead_invertedbreve.
+    
+    Signed-off-by: Ken Moffat <ken@linuxfromscratch.org>
+    Signed-off-by: James Cloos <cloos@jhcloos.com>
+
+commit c23d61d1b84dca3740bf4786978c7908d0065fb9
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 18:10:27 2013 -0800
+
+    Assume size_t is always available, since it was defined in C89
+    
+    Don't provide a fallback definition #ifdef X_NOT_POSIX anymore.
+    We already use size_t throughout the rest of Xlib, just had this
+    one instance left in XKBGAlloc.c of a fallback definition.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 9bcfd84aa1410387bc8cf002a5f90f44705aa0d1
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Mar 1 18:09:07 2013 -0800
+
+    unifdef XKB_IN_SERVER
+    
+    Leftovers from XKB files that were previously shared between the client
+    and server code, but aren't any more.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 769a0efa2298040fe8316a89fc9e75fb61e288e5
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Thu Feb 28 20:04:25 2013 -0800
+
+    unifdef CRAY & _CRAY
+    
+    (mostly performed with unifdef, followed by some manual cleanup of
+     the remaining code)
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit ca106eb03e5f5468df8033300c5caae3d3c6936b
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Thu Feb 28 20:04:25 2013 -0800
+
+    unifdef WORD64
+    
+    WORD64 seems to have only been defined in <X11/Xmd.h> when building for
+    CRAY, to handle int being a 64-bit value (ILP64, not LP64) and having
+    64-bit alignment requirements.
+    
+    It hadn't been fully supported even before autotooling, as can be
+    seen by removed code such as:
+    
+     #ifdef WORD64
+     _XkbWriteCopyData32 Not Implemented Yet for sizeof(int)==8
+     #endif
+    
+    (mostly performed with unifdef, followed by some manual cleanup of
+     the remaining code)
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 9399caf2c12cbe1ed56f4f6b368c5811cb5d0458
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Thu Feb 28 20:04:25 2013 -0800
+
+    unifdef MUSTCOPY
+    
+    MUSTCOPY seems to have only been defined in <X11/Xmd.h> when building for
+    CRAY, to handle missing some sizes of integer type.
+    
+    (mostly performed with unifdef, followed by some manual cleanup of
+     spacing/indenting in the remaining code)
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit b687440c28c7da6ee0ae44514d20248db5161606
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sat Feb 16 10:42:23 2013 -0800
+
+    Convert more sprintf calls to snprintf
+    
+    You could analyze most of these and quickly recognize that there was no
+    chance of buffer overflow already, but why make everyone spend time doing
+    that when we can just make it obviously safe?
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit b092dabbd712d7b656abcf572d253b9b206c0237
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Feb 15 23:43:12 2013 -0800
+
+    XKeysymToString: move variable declarations to the scope of their usage
+    
+    Makes it easier for readers to understand scope of variable usage, and
+    clears up gcc warning:
+    
+    KeysymStr.c: In function 'XKeysymToString':
+    KeysymStr.c:128:13: warning: declaration of 'i' shadows a previous local [-Wshadow]
+    KeysymStr.c:73:18: warning: shadowed declaration is here [-Wshadow]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit f0b171c8ea7b055ba520272ea9a2604e18841ac7
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Feb 15 23:34:40 2013 -0800
+
+    Preserve constness in casting arguments through the Data*() routines
+    
+    Casts were annoying gcc by dropping constness when changing types,
+    when routines simply either copy data into the request buffer or
+    send it directly to the X server, and never modify the input.
+    
+    Fixes gcc warnings including:
+    ChProp.c: In function 'XChangeProperty':
+    ChProp.c:65:6: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    ChProp.c:65:6: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    ChProp.c:74:6: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    ChProp.c:74:6: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    ChProp.c:83:6: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    SetHints.c: In function 'XSetStandardProperties':
+    SetHints.c:262:20: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    SetPntMap.c: In function 'XSetPointerMapping':
+    SetPntMap.c:46:5: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    SetPntMap.c:46:5: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    StBytes.c: In function 'XStoreBuffer':
+    StBytes.c:97:33: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    StName.c: In function 'XStoreName':
+    StName.c:40:27: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    StName.c: In function 'XSetIconName':
+    StName.c:51:27: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 6c558ee357292dd9dfc6d9006f4525f625327c52
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Feb 15 22:58:54 2013 -0800
+
+    Fix comment typo & confusing indentation levels in Data() macro definition
+    
+    The final } matches the one on the #define line, not one that doesn't
+    appear after the else statement it was lined up with
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit afd6593da90e51234d59f8921c411317f91ab48b
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Feb 15 23:25:38 2013 -0800
+
+    XStringToKeysym: preserve constness when casting off unsignedness for strcmp
+    
+    Fixes gcc warning:
+    StrKeysym.c:97:17: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 7e3bf4dd83fec22bd568146de75e6d59eff74e21
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Feb 15 23:14:40 2013 -0800
+
+    XRebindKeysym: Drop unnecessary const-removing cast
+    
+    C89 defines memcpy as taking a const void *, so casting from
+    const unsigned char * to char * simply angers gcc for no benefit:
+    
+    KeyBind.c:1017:24: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 54527eab93d46055cf11eb6c18abb353a03ae544
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Feb 15 22:45:19 2013 -0800
+
+    cmsColNm.c: maintain constness of arguments to qsort helper function
+    
+    Fixes gcc warning:
+    
+    cmsColNm.c: In function 'FirstCmp':
+    cmsColNm.c:257:20: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    cmsColNm.c:257:45: warning: cast discards '__attribute__((const))' qualifier from pointer target type [-Wcast-qual]
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit deedeada53676ee529d700bf96fde0b29a3a1def
+Author: Nickolai Zeldovich <nickolai@csail.mit.edu>
+Date:   Tue Jan 22 10:03:00 2013 -0500
+
+    XListFontsWithInfo: avoid accessing realloc'ed memory
+    
+    If exactly one of the two reallocs in XListFontsWithInfo() fails, the
+    subsequent code accesses memory freed by the other realloc.
+    
+    Signed-off-by: Nickolai Zeldovich <nickolai@csail.mit.edu>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit f57fd760cba92ad846917f21e94e73e9c846185f
+Author: Colin Walters <walters@verbum.org>
+Date:   Wed Jan 4 17:37:06 2012 -0500
+
+    autogen.sh: Implement GNOME Build API
+    
+    http://people.gnome.org/~walters/docs/build-api.txt
+    
+    Signed-off-by: Adam Jackson <ajax@redhat.com>
+
+commit 51c102d39e855cf1704d9eb3afba76a2e73c6b81
+Author: Adam Jackson <ajax@redhat.com>
+Date:   Tue Jan 15 14:28:48 2013 -0500
+
+    configure: Remove AM_MAINTAINER_MODE
+    
+    Signed-off-by: Adam Jackson <ajax@redhat.com>
+
+commit 3cd974b1d4d1fa6389d3695fa9fcc0c22a51d50c
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Wed Dec 26 22:57:39 2012 -0800
+
+    Remove unused DECnet ("DNETCONN") code from Xlib
+    
+    Has never been converted to build in modular builds, so has been unusable
+    since X11R7.0 release in 2005.  DNETCONN support was removed from xtrans
+    back in 2008.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit a6e5b36a3e6d4a7a9fb4bad905ed127e67b1957e
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Wed Dec 26 22:56:38 2012 -0800
+
+    Remove unused TLI ("STREAMSCONN") code from Xlib
+    
+    Has never been converted to build in modular builds, so has been unusable
+    since X11R7.0 release in 2005.  All known platforms with TLI/XTI support
+    that X11R7 & later releases run on also have (and mostly prefer) BSD
+    socket support for their networking API.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 59c9ee8cd58857c5769b643611cbe526005a9e45
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Sun Dec 16 17:44:42 2012 -0800
+
+    Tell clang not to report -Wpadded warnings on public headers we can't fix
+    
+    Better to silence the compiler warning than break ABI.
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 0b148750027fd0557c5ed93afda861ddf4b92e0f
+Author: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date:   Mon Nov 12 17:27:52 2012 +0000
+
+    Fix config check for loadable modules
+    
+    The config check of the results of testing for dlfcn.h or dl.h just tests the
+    value of the ac_cv_ variables, which will be 'yes' or 'no', rather than checking
+    it is 'yes', so loadable module support would always be detected.
+    
+    This is necessary for successful compilation for the MinGW target without the
+    optional dlfcn-win32 library.
+    
+    v2: Also, fixed typoed name of ac_cv_header_dlfcn_h, so check still works
+    correctly when dlfcn.h is available
+    
+    Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+    Reviewed-by: Dan Nicholson <dbn.lists@gmail.com>
+
+commit cd25cab4b5b957641183ce72dd1ae0424aff1663
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 18:27:02 2011 +0200
+
+    Install Xcms.txt in $(datadir) rather than $(libdir).
+    
+    This file is an architecture independent data and should be where
+    other databases are.
+    This is the Xlib provided sample file, applications are free to
+    use a different one specifying its location in the XCMSDB env
+    variable.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 51fef7e273b5c6256e4c9604e3e1afe5dc8f6a1a
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 18:25:24 2011 +0200
+
+    Don't hard code path to Xcms.txt file.
+    
+    The path to this file is configurable at build time. The source
+    however contains a hard coded path.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 9833489e6c3829a1e835bc0a11f028fc180809e4
+Author: Colin Walters <walters@verbum.org>
+Date:   Fri Dec 7 08:51:21 2012 -0500
+
+    Fix build after dropping locales
+    
+    They also needed to be removed from configure.ac
+    
+    Signed-off-by: Colin Walters <walters@verbum.org>
+    Signed-off-by: Julien Cristau <jcristau@debian.org>
+
+commit 0a740a574aaf0c0eec78859b773a532cff3b74c3
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 13:04:11 2011 +0200
+
+    i18n: Uppercased all occurances if 'iso8859' in the full locale name.
+    
+    Making all occurances of iso8859 upper case in the full local name
+    makes the alias entries more consistent and match the entries on
+    locale.dir.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 5e7d589697755a70fb22d85c6a1ae82b39843e53
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 17:55:49 2011 +0200
+
+    i18n: Remove ja.S90 and ja.U90 locales.
+    
+    Both locales carry a copyright notice and a prorietary statement:
+    
+    Copyright 1995 by FUJITSU LIMITED
+    This is source code modified by FUJITSU LIMITED under the Joint
+    Development Agreement for the CDEnext PST.
+    This is unpublished proprietary source code of FUJITSU LIMITED
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 99eae3dcb7bf6764e3b243d2a2934a4d1ecce90e
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 16:46:15 2011 +0200
+
+    i18n: Bring locale.dir and compose.dir in sync.
+    
+    Some entries for locale/encoding combinations were missing from
+    either file or just misspelled, some entries were wrong or just
+    aliases.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit d1e6baa4e290b758e430077cb74e7c03ad850771
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 14:02:39 2011 +0200
+
+    i18n: Treat 'a3_AZ' as an alias for 'az_AZ'.
+    
+    locale.alias contains a comment:
+    XCOMM a3 is not an ISO 639 language code, but in Cyrillic, "Z" looks like "3".
+    Thus lets treat 'a3' as an alias for 'az'.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Magnus Kessler <Magnus.Kessler@gmx.net>
+
+commit fa2aab0bea18efa26a56977d3166277582ab7b07
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 13:09:38 2011 +0200
+
+    i18n: Fixed typos in full locale names.
+    
+    Fixing those typos those names actually match entries in
+    locale.dir.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit b88dd95005dce4c40f9b4d5f938f945e7955fd04
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Sat May 21 07:29:38 2011 +0200
+
+    i18n: Remove duplicates and aliases to oneself.
+    
+    Aliases to itself don't make much sense.
+    This changes occurances of:
+    xy_UV.UTF-8:			xy_UV.UTF-8
+    to
+    xy_UV:			xy_UV.UTF-8
+    where applicable.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: James Cloos <cloos@jhcloos.com>
+
+commit f198c6aa98f88ff285d903175a3c4c0fd33a4575
+Author: Jens Herden <jens.herden@email.de>
+Date:   Fri May 20 17:29:03 2011 +0200
+
+    i18n: Add support for Khmer locale and compose table.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: James Cloos <cloos@jhcloos.com>
+
+commit 40761898692e5063957bfa2518cca3d35b2e354a
+Author: Kalman Kemenczy <kkemenczy@novell.com>
+Date:   Fri May 20 17:03:24 2011 +0200
+
+    i18n: Add support for Serbian specific compose table entries.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: James Cloos <cloos@jhcloos.com>
+
+commit 7c14aacc9f01d7a975f8d9d033b9b13cbd777a61
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 14:00:35 2011 +0200
+
+    i18n: Adding and removing comments.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: James Cloos <cloos@jhcloos.com>
+
+commit 7754d68976106183751243c2c35a84134be17b34
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 13:45:31 2011 +0200
+
+    i18n: Add missing locales which existed in locale.alias.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: James Cloos <cloos@jhcloos.com>
+
+commit 952eccd0d25ba66023acfd31873eee2e71c38c42
+Author: Egbert Eich <eich@freedesktop.org>
+Date:   Fri May 20 10:57:57 2011 +0200
+
+    i18n: Consolidate compose handling for locales with UTF-8 encoding.
+    
+    - add an entry to include the default en_US compose file
+      for the ja_JP, ko_KR, th_TH, zh_CN, zh_HK and zh_TW locales.
+    - add missing entries for zh_CN. and zh_HK and am_ET.
+    - change entries for the UTF-8 encoding for ru_RU, ja_JP,
+      ko_KR, th_TH and zh_TW to point to their native directory
+      entries.
+    
+    Signed-off-by: Egbert Eich <eich@freedesktop.org>
+    Reviewed-by: James Cloos <cloos@jhcloos.com>
+
+commit d14b6a250f004fa405179db7020f6953001d17b9
+Author: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+Date:   Mon Oct 22 13:54:11 2012 -0500
+
+    XIM: remove Private and Public macros
+    
+    Private is a struct member name in mingw-w64 <winioctl.h>, causing this
+    useless define in a private header to break the build.
+    
+    Signed-off-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+    Reviewed-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+
+commit f2a8def423a46d52e834cf7ea49fa0079427663a
+Author: Adam Jackson <ajax@redhat.com>
+Date:   Wed Oct 17 14:40:43 2012 -0400
+
+    XErrorDB: Add GLXBadProfileARB
+    
+    Signed-off-by: Adam Jackson <ajax@redhat.com>
+
+commit d45b3fc19fbe95c41afc4e51d768df6d42332010
+Author: Ross Burton <ross.burton@intel.com>
+Date:   Wed Sep 12 14:39:40 2012 +0100
+
+    Allow overriding location of keysymdef.h
+    
+    Currently keysymdef.h is found by using the includedir of xproto.  This doesn't
+    work when cross-compiling with a sysroot as that ends up being /usr/include/X11,
+    not a path into the cross-build environment.
+    
+    So, add an option to allow explicitly specifying the location of keysymdef.h,
+    and verify that the specified or found path exists.
+    
+    (original patch by Martin Jansa <martin.jansa@gmail.com>, revised by myself)
+    
+    Signed-off-by: Ross Burton <ross.burton@intel.com>
+    Reviewed-by: Dan Nicholson <dbn.lists@gmail.com>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit 44cdc0dc2c68d67654023ec707b807145d3a38c0
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Aug 23 19:15:07 2012 -0400
+
+    Renove some unnecessary low-level markup.
+    
+    Also, SYNTAX -> SYNOPSIS so function prototypes get parsed by doclifter.
+    This appears to have been somebody's thinko, it's only in a few of the files.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+commit b686600ab5ca93b5750f827786e79c329ab2db4d
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Aug 23 10:53:33 2012 -0400
+
+    The .NT/.NE macro pair is no longer used.  Remove it.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+commit b83f2898528c5dd683acd2a2143879a760a8dad5
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Aug 23 10:42:46 2012 -0400
+
+    Remove the one and only use of the .NT/.NE pair.
+    
+    The problem with these macros is that they rely on being able to
+    center the note label.  That doesn't play well with modern HTML,
+    not anyway without coomplications like CSS.  This use was just a cute
+    trick, not adding enough value to be kept.
+
+commit e9509fa6745d25eee01ec6f1c34edf8a806d66b3
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Aug 23 10:23:45 2012 -0400
+
+    The .C{ and .C} macros are never used.  Remove them.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+commit 6b2f7ddeea6c87dbec4ddfc19b1fed33f1bb8575
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Aug 23 10:08:08 2012 -0400
+
+    The .FN macro, paired with .FD, is also never used. Remove it.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+commit cac6572701c976542da562b2b277b07ffb892a6f
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Aug 23 10:03:00 2012 -0400
+
+    The ".FD" macro is never used.  Remove it.
+    
+    It was a temptation to presentation-level klugery and is best gone.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+commit 6e27a828f39f7028bc7f4a8736e7262fca250632
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Aug 23 09:54:25 2012 -0400
+
+    Clean up, my last commit missed four cases.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+commit a7fb575957ff4d9dd3671994a005ac3be8bb10fe
+Author: Eric S. Raymond <esr@thyrsus.com>
+Date:   Thu Aug 23 08:24:17 2012 -0400
+
+    Eliminate all uses of tab stops in the libX11 man pages.
+    
+    Two steps: First, expand tabs to 8 spaces in code and structure
+    listings.  Second, make the .Ds used to wrap code listings switch to
+    constant-width font (CW) rather than numeric font position 1, which
+    maps to R on most systems.
+    
+    It is possible some archaic systems won't know what CW is, but the
+    only risk is that code listings won't look quite right on troff
+    devices; the PostScript and DVI drivers definitely grok it, so those
+    important cases are OK.
+    
+    The purpose of these changes is to get rid of presentation-level
+    markup so these pages will lift clean to DocBook.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+commit 8042f88ace33573f9d0dfaa21ed54ac7cef266d5
+Author: Will Thompson <will@willthompson.co.uk>
+Date:   Mon Jul 9 18:00:27 2012 +0100
+
+    Add compose sequences for "therefore" and "because".
+    
+    These sequences look sensible to me. I added them to the APL-related
+    section of Mathematical Operators—they're in that section of Unicode
+    anyway.
+    
+    https://bugs.freedesktop.org/show_bug.cgi?id=51922
+    
+    Signed-off-by: Will Thompson <will@willthompson.co.uk>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit 65358ea5079236b2508f787ac2fb2024a477e36d
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Jun 29 23:08:04 2012 -0700
+
+    Convert XCreate{Pix,Bit}map...Data to use C99 designated initializers
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
+commit 0dc93f7e43deb102b1f8fb7c4c4844cdce7ffd1e
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Fri Jun 29 22:57:13 2012 -0700
+
+    XCreate{Pix,Bit}map...Data: Free pixmap in error path if XCreateGC fails
+    
+    Fixes leaks in error paths found by Parfait 1.0.0:
+    
+    Error: X Resource Leak
+       Leaked X Resource pix
+            at line 62 of CrBFData.c in function 'XCreateBitmapFromData'.
+              pix initialized at line 60 with XCreatePixmap
+    Error: X Resource Leak
+       Leaked X Resource pix
+            at line 70 of CrPFBData.c in function 'XCreatePixmapFromBitmapData'.
+              pix initialized at line 66 with XCreatePixmap
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+    Reviewed-by: Aaron Plattner <aplattner@nvidia.com>
+
+commit dce84b8c39ad5a8908c29bb6de25b6c3004c1ab7
+Author: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date:   Wed Jun 6 13:31:16 2012 -0700
+
+    libX11 spec: Correct prototype for XConvertSelection
+    
+    selection & target parameters were accidentally run together
+    
+    Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+
 commit 6c5cb2a90a6479f56855e5167039c37c234cdfe7
 Author: Alan Coopersmith <alan.coopersmith@oracle.com>
 Date:   Fri Jun 1 23:37:09 2012 -0700
