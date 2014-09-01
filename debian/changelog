@@ -1,12 +1,63 @@
-libx11 (2:1.5.0-1+deb7u1) wheezy-security; urgency=high
+libx11 (2:1.6.2-3) unstable; urgency=medium
 
-  * CVE-2013-1981: integer overflows calculating memory needs for replies
-  * CVE-2013-1997: buffer overflows due to not validating length or offset
-    values in replies
-  * CVE-2013-2004: unbounded recursion parsing user-specified files
-    (closes: #145048)
+  [ Julien Cristau ]
+  * libx11-6.symbols: yet another 64bit arch (ppc64el).  Closes: #749728.
 
- -- Julien Cristau <jcristau@debian.org>  Tue, 21 May 2013 23:14:14 +0200
+ -- Cyril Brulebois <kibi@debian.org>  Mon, 18 Aug 2014 01:39:32 +0200
+
+libx11 (2:1.6.2-2) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * Yet more 64 bit archs in symbols file: mips64{,el} (closes: #722088).
+  * Remove Cyril Brulebois from Uploaders.
+  * Bump debhelper compat level from 5 to 7.
+  * Switch from xsfbs.mk to standard quilt patching.
+
+  [ Colin Watson ]
+  * Declare libx11-xcb-dev Multi-Arch: same (closes: #727231).
+
+ -- Julien Cristau <jcristau@debian.org>  Sun, 11 May 2014 18:04:23 +0200
+
+libx11 (2:1.6.2-1) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * So apparently the 64-bit powerpc port is called ppc64 (closes: #613820).
+
+  [ Maarten Lankhorst ]
+  * New upstream release.
+
+ -- Maarten Lankhorst <maarten.lankhorst@ubuntu.com>  Thu, 03 Oct 2013 09:46:46 +0200
+
+libx11 (2:1.6.1-1) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * New upstream release
+  * libx11-6.symbols: add powerpc64 to the list of 64bit archs (closes: #613820)
+
+  [ Wookey ]
+  * Update symbols file for arm64
+
+ -- Julien Cristau <jcristau@debian.org>  Mon, 12 Aug 2013 17:55:45 +0200
+
+libx11 (2:1.6.0-1) unstable; urgency=low
+
+  * Bump libx11-dev's x11proto-core-dev dependency to 7.0.17 for _X_NORETURN
+    (closes: #649866).
+  * New upstream release
+    - Fix unbounded recursion when reading resource files (closes: #145048)
+    - XmbLookupString man page no longer warns (closes: #300819)
+    - Fix build with automake 1.13 (closes: #710467)
+  * Update 003_recognize_glibc_2.3.2_locale_names.diff.
+  * Update 006_tailor_pt_BR.UTF-8_Compose.diff.
+  * Refresh 008_remove_ko_Compose.diff.
+  * Update 009_remove_th_Compose.diff.
+  * Refresh 015_russian_locale_alias.diff.
+  * Bump shlibs and symbols for _XEatDataWords.
+  * Add new locales to configure.ac so they can get installed.
+  * Disable silent rules.
+  * Use dpkg-buildflags.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 15 Jun 2013 18:31:27 +0200
 
 libx11 (2:1.5.0-1) unstable; urgency=low
 

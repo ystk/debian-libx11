@@ -12,9 +12,9 @@ This will make it easier for russians to fit in with the rest of the world.
 
 Index: libx11/nls/locale.alias.pre
 ===================================================================
---- libx11.orig/nls/locale.alias.pre
-+++ libx11/nls/locale.alias.pre
-@@ -1250,7 +1250,7 @@ portuguese:					pt_PT.ISO8859-1
+--- libx11.orig/nls/locale.alias.pre	2013-06-15 17:53:12.467725093 +0200
++++ libx11/nls/locale.alias.pre	2013-06-15 17:53:16.183725049 +0200
+@@ -1274,7 +1274,7 @@
  portuguese.iso88591:				pt_PT.ISO8859-1
  romanian:					ro_RO.ISO8859-2
  rumanian:					ro_RO.ISO8859-2

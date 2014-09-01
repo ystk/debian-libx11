@@ -30,7 +30,7 @@ in this Software without prior written authorization from The Open Group.
 #include "Xlibint.h"
 #include <limits.h>
 
-#if defined(XF86BIGFONT) && !defined(MUSTCOPY)
+#if defined(XF86BIGFONT)
 #define USE_XF86BIGFONT
 #endif
 #ifdef USE_XF86BIGFONT
@@ -107,7 +107,7 @@ XFontStruct **info)	/* RETURN */
 		if (! (finfo = Xmalloc(sizeof(XFontStruct) * size)))
 		    goto clearwire;
 		if (! (flist = Xmalloc(sizeof(char *) * (size+1)))) {
-		    Xfree((char *) finfo);
+		    Xfree(finfo);
 		    goto clearwire;
 		}
 	    }
@@ -127,31 +127,9 @@ XFontStruct **info)	/* RETURN */
 	fs->ascent 		= cvtINT16toInt (reply.fontAscent);
 	fs->descent 		= cvtINT16toInt (reply.fontDescent);
 
-#ifdef MUSTCOPY
-	{
-	    xCharInfo *xcip;
-
-	    xcip = (xCharInfo *) &reply.minBounds;
-	    fs->min_bounds.lbearing = xcip->leftSideBearing;
-	    fs->min_bounds.rbearing = xcip->rightSideBearing;
-	    fs->min_bounds.width = xcip->characterWidth;
-	    fs->min_bounds.ascent = xcip->ascent;
-	    fs->min_bounds.descent = xcip->descent;
-	    fs->min_bounds.attributes = xcip->attributes;
-
-	    xcip = (xCharInfo *) &reply.maxBounds;
-	    fs->max_bounds.lbearing = xcip->leftSideBearing;
-	    fs->max_bounds.rbearing = xcip->rightSideBearing;
-	    fs->max_bounds.width = xcip->characterWidth;
-	    fs->max_bounds.ascent = xcip->ascent;
-	    fs->max_bounds.descent = xcip->descent;
-	    fs->max_bounds.attributes = xcip->attributes;
-	}
-#else
 	/* XXX the next two statements won't work if short isn't 16 bits */
 	fs->min_bounds = * (XCharStruct *) &reply.minBounds;
 	fs->max_bounds = * (XCharStruct *) &reply.maxBounds;
-#endif /* MUSTCOPY */
 
 	fs->n_properties = reply.nFontProps;
 	fs->properties = NULL;
@@ -174,7 +152,7 @@ XFontStruct **info)	/* RETURN */
 	    nbytes++; /* make first string 1 byte longer, to match XListFonts */
 	flist[i] = Xmalloc (nbytes);
 	if (! flist[i]) {
-	    if (finfo[i].properties) Xfree((char *) finfo[i].properties);
+	    if (finfo[i].properties) Xfree(finfo[i].properties);
 	    goto badmem;
 	}
 	if (!i) {
@@ -199,10 +177,10 @@ XFontStruct **info)	/* RETURN */
         if (j == 0)
             flist[j]--;         /* was incremented above */
         Xfree(flist[j]);
-        if (finfo[j].properties) Xfree((char *) finfo[j].properties);
+        if (finfo[j].properties) Xfree(finfo[j].properties);
     }
-    if (flist) Xfree((char *) flist);
-    if (finfo) Xfree((char *) finfo);
+    if (flist) Xfree(flist);
+    if (finfo) Xfree(finfo);
 
   clearwire:
     /* Clear the wire. */
@@ -230,7 +208,7 @@ XFreeFontInfo (
 		for (i = 1; i < actualCount; i++) {
 			Xfree (names[i]);
 		}
-		Xfree((char *) names);
+		Xfree(names);
 	}
 	if (info) {
 		for (i = 0; i < actualCount; i++) {
@@ -238,12 +216,12 @@ XFreeFontInfo (
 #ifdef USE_XF86BIGFONT
 				_XF86BigfontFreeFontMetrics(&info[i]);
 #else
-				Xfree ((char *) info[i].per_char);
+				Xfree (info[i].per_char);
 #endif
 			if (info[i].properties)
-				Xfree ((char *) info[i].properties);
+				Xfree (info[i].properties);
 			}
-		Xfree((char *) info);
+		Xfree(info);
 	}
 	return 1;
 }
