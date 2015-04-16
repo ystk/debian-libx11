@@ -6,3 +6,4 @@
 008_remove_ko_Compose.diff
 009_remove_th_Compose.diff
 015_russian_locale_alias.diff
+016_CVE-2013-7439.diff

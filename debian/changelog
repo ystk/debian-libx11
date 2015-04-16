@@ -1,3 +1,10 @@
+libx11 (2:1.3.3-4+squeeze2) squeeze-lts; urgency=high
+
+  * Non-maintainer upload from the Debian LTS team.
+  * CVE-2013-7439: buffer overflow in the MakeBigReq macro
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Tue, 14 Apr 2015 20:49:09 +0200
+
 libx11 (2:1.3.3-4+squeeze1) squeeze-security; urgency=high
 
   * CVE-2013-1981: integer overflows calculating memory needs for replies
