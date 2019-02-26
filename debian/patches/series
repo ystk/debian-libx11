@@ -4,3 +4,6 @@
 008_remove_ko_Compose.diff
 009_remove_th_Compose.diff
 015_russian_locale_alias.diff
+CVE-2018-14599.patch
+CVE-2018-14600.patch
+CVE-2018-14598.patch

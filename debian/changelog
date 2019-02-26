@@ -1,3 +1,23 @@
+libx11 (2:1.6.2-3+deb8u2) jessie-security; urgency=high
+
+  * Non-maintainer upload by the LTS team.
+  * Fix CVE-2018-14598, CVE-2018-14599 and CVE-2018-14600:
+  * CVE-2018-14599:
+    The functions XGetFontPath, XListExtensions, and XListFonts are vulnerable
+    to an off-by-one override on malicious server responses.
+  * CVE-2018-14600:
+    The length value is interpreted as signed char on many systems (depending
+    on default signedness of char), which can lead to an out of boundary write
+    up to 128 bytes in front of the allocated storage, but limited to NUL
+    byte(s).
+  * CVE-2018-14598:
+    If the server sends a reply in which even the first string would overflow
+    the transmitted bytes, list[0] (or flist[0]) will be set to NULL and a
+    count of 0 is returned. This may trigger a segmentation fault leading to a
+    Denial of Service.
+
+ -- Markus Koschany <apo@debian.org>  Wed, 29 Aug 2018 23:24:26 +0200
+
 libx11 (2:1.6.2-3+deb8u1) jessie; urgency=medium
 
   * Insufficient validation of data from the X server can cause out of
