@@ -1,3 +1,21 @@
+libx11 (2:1.6.2-3+deb8u4) jessie-security; urgency=high
+
+  * Non-maintainer upload by the ELTS team.
+  * Fix a regression introduced by the CVE-2020-14344 fix which prevented
+    some input clients from connecting to the server.
+  * Fix integer overflow in init_om which could lead to a double free.
+    (Fixes: CVE-2020-14363) (Closes: #969008)
+
+ -- Utkarsh Gupta <utkarsh@debian.org>  Thu, 03 Sep 2020 03:45:32 +0530
+
+libx11 (2:1.6.2-3+deb8u3) jessie-security; urgency=high
+
+  * Non-maintainer upload by the ELTS team.
+  * Add patch to fix heap corruption in the X input method client.
+    (Fixes: CVE-2020-14344)
+
+ -- Utkarsh Gupta <utkarsh@debian.org>  Sun, 02 Aug 2020 22:56:07 +0530
+
 libx11 (2:1.6.2-3+deb8u2) jessie-security; urgency=high
 
   * Non-maintainer upload by the LTS team.
