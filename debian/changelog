@@ -1,3 +1,10 @@
+libx11 (2:1.6.2-3+deb8u5) jessie-security; urgency=medium
+
+  * CVE-2021-31535: X protocol command injection due to missing request
+    length checks (closes: #988737)
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Fri, 21 May 2021 09:47:30 +0200
+
 libx11 (2:1.6.2-3+deb8u4) jessie-security; urgency=high
 
   * Non-maintainer upload by the ELTS team.
