@@ -1,3 +1,11 @@
+libx11 (2:1.6.2-3+deb8u6) jessie-security; urgency=medium
+
+  * Non-maintainer upload by the ELTS Security Team.
+  * CVE-2023-3138: Missing input validation in various functions
+    may result in denial of service.
+
+ -- Adrian Bunk <bunk@debian.org>  Thu, 29 Jun 2023 14:25:36 +0300
+
 libx11 (2:1.6.2-3+deb8u5) jessie-security; urgency=medium
 
   * CVE-2021-31535: X protocol command injection due to missing request
