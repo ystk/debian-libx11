@@ -12,3 +12,9 @@ CVE-2020-14344-regression.patch
 CVE-2020-14363.patch
 CVE-2021-31535.patch
 0001-InitExt.c-Add-bounds-checks-for-extension-request-ev.patch
+CVE-2023-43785.patch
+CVE-2023-43786.patch
+XCreatePixmap-trigger-BadValue-error-for-out-of-range-dimensions.patch
+XPutImage-clip-images-to-maximum-height-width-allowed-by-protocol.patch
+CVE-2023-43787.patch
+XOpenDisplay-ensure-each-screen-has-a-valid-root_visual-pointer.patch

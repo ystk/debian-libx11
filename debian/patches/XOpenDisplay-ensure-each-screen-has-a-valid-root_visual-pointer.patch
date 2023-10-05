@@ -1,0 +1,34 @@
+From 78b37accff1abbe713349d59fdefd963ffa04bbc Mon Sep 17 00:00:00 2001
+From: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date: Sun, 17 Sep 2023 10:11:02 -0700
+Subject: [PATCH] XOpenDisplay: ensure each screen has a valid root_visual
+ pointer
+
+Other code assumes this pointer cannot be NULL, so fail the connection
+if a bug has caused the X server to give a non-existent visual ID for
+the default visual of any screen.
+
+Reported-by: Gregory James DUCK <gjduck@gmail.com>
+Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+---
+ src/OpenDis.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/OpenDis.c b/src/OpenDis.c
+index 7c8d4e1a..89a0ebdf 100644
+--- a/src/OpenDis.c
++++ b/src/OpenDis.c
+@@ -473,6 +473,10 @@ XOpenDisplay (
+ 		}
+ 	    }
+ 	    sp->root_visual = _XVIDtoVisual(dpy, root_visualID);
++	    if (sp->root_visual == NULL) {
++		OutOfMemory(dpy);
++		return(NULL);
++	    }
+ 	}
+ 
+ 	if(usedbytes != setuplength){
+-- 
+GitLab
+
